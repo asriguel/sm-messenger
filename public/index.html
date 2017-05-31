@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messenger</title>
+
+    <!-- Angular -->
+    <script src="bower_components/angular/angular.min.js"></script>
+    <!-- jQuery -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Angular-bootstrap -->
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <!-- angular-cookies -->
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <!-- ng-textarea-enter -->
+    <script src="bower_components/ng-textarea-enter/build/ng-textarea-enter.min.js"></script>
+    <!-- toaster -->
+    <link rel="stylesheet" href="bower_components/AngularJS-Toaster/toaster.min.css">
+    <script src="bower_components/AngularJS-Toaster/toaster.min.js"></script>
+    <!-- angular-sanitize -->
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <!-- angular-moment -->
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/moment/locale/ru.js"></script>
+    <script src="bower_components/angular-moment/angular-moment.min.js"></script>
+
+    <!-- app -->
+    <script src="app.js"></script>
+
+    <!-- Services -->
+    <script src="services/BaseService.js"></script>
+    <script src="services/VkService.js"></script>
+
+    <!-- Controllers -->
+    <script src="controllers/messages.controller.js"></script>
+
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body ng-app="MessengerApp" ng-controller="messagesController as msgsCtrl">
+<toaster-container></toaster-container>
+<div id="top">
+    <button class="btn btn-success" ng-if="true" ng-click="msgsCtrl.addService()">Add new service</button>
+</div>
+<div class="col-md-3 no-float" id="nav" ng-class="{'centered': !msgsCtrl.dialogs.length}">
+            <span ng-if="!msgsCtrl.dialogs.length">
+                No dialogs
+            </span>
+    <ul class="friend-list">
+        <li class="bounceInDown" ng-repeat="dialog in msgsCtrl.dialogs" ng-class="{'active': dialog.unread}">
+            <a href="#" class="clearfix" ng-click="msgsCtrl.rerenderMessages(dialog)">
+                <img ng-src="{{dialog.photo}}" alt="" class="img-circle">
+                <div class="friend-name" ng-switch="dialog.type">
+                    <strong ng-bind="dialog.full_name" ng-switch-when="1"></strong>
+                    <strong ng-bind="dialog.chat_title" ng-switch-when="2"></strong>
+                </div>
+                <div class="last-message text-muted" ng-bind-html="dialog.text"></div>
+                <small class="time text-muted" am-time-ago="dialog.date"></small>
+                <small class="chat-alert label label-danger">1</small>
+            </a>
+        </li>
+    </ul>
+
+</div>
+<div class="col-md-9 no-float" id="main">
+    <ul class="chat">
+        <li ng-repeat="message in msgsCtrl.messages" class="left clearfix"><span class="chat-img pull-left">
+                            <img ng-src="{{message.photo}}" alt="User Avatar" class="img-circle"/>
+                        </span>
+            <div class="chat-body clearfix">
+                <div class="header">
+                    <strong class="primary-font" ng-bind="message.full_name"></strong>
+                    <small class="pull-right text-muted">
+                        <span class="glyphicon glyphicon-time"></span> <span am-time-ago="message.date"></span>
+                    </small>
+                </div>
+                <p ng-bind-html="message.text">
+
+                </p>
+            </div>
+        </li>
+    </ul>
+</div>
+<textarea id="msgbox" class="col-md-9" ng-model="message" ng-textarea-enter="msgsCtrl.textareaAction()" placeholder="Type message"></textarea>
+</body>
+</html>
