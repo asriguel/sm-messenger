@@ -4,6 +4,8 @@ app.controller('messagesController', function ($scope, $rootScope, $uibModal, $w
 
     // init vkService
     vkService.setClientId(6033392);
+	// init mailruService
+	//mailruService.setClientId(754302);
 
     let services = [vkService];
 
