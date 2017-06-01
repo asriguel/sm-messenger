@@ -4,5 +4,7 @@ app.config(function ($sceDelegateProvider) {
     $sceDelegateProvider.resourceUrlWhitelist([
         'self',
         'https://api.vk.com/**',
-        'https://**.vk.com/**']);
+        'https://**.vk.com/**',
+		'https://appsmail.ru/**',
+		'https://**.mail.ru/**']);
 });
