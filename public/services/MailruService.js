@@ -34,7 +34,7 @@ class MailruService extends BaseService {
 			app_id: this.clientId,
 			method: methodName,
 			session_key: this.token,
-			...restParams
+			// ...restParams
 		};
 		const sig = this.makeSig(params);
 		params.sig = sig;

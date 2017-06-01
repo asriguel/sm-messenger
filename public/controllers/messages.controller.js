@@ -1,11 +1,14 @@
-app.controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, toaster) {
+app
+    .controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, mailruService, toaster) {
     this.dialogs = [];
     this.messages = [];
 
     // init vkService
     vkService.setClientId(6033392);
 
-    let services = [vkService];
+    mailruService.setClientId(754302);
+
+    let services = [vkService, mailruService];
 
     this.updateDialogs = () => {
         services.forEach((service) => {
