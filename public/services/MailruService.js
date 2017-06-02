@@ -65,7 +65,11 @@ class MailruService extends BaseService {
 				full_name: `${user.first_name} ${user.last_name}`,
 				photo: user.has_pic ? user.pic : ""
 			};
-		}).catch(err => this.toaster.pop("error", err.service, err.message));
+		}).catch(err => {
+			console.error("initUser failed:");
+			console.error(err);
+			this.toaster.pop("error", err.service, err.message);
+		});
 	}
 	
 	poll() {
@@ -91,8 +95,7 @@ class MailruService extends BaseService {
         this.connected = true;
         //this.$rootScope.$emit('updateDialogs');
 		
-		this.initUser();
-		this.setupPoller();
+		return this.initUser().then(() => this.setupPoller());
 	}
 	
 	auth() {
@@ -123,7 +126,7 @@ class MailruService extends BaseService {
                 this.$cookies.put('mailru_token', token);
 				this.$cookies.put(`mailru_uid`, uid);
 				console.log(`Authorization successful: token=${token}, uid=${uid}`);
-                this.connect(token, uid);
+                return this.connect(token, uid);
             });
 	}
 	
