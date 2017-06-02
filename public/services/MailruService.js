@@ -48,10 +48,7 @@ class MailruService extends BaseService {
 		const requestParams = Object.keys(params).map(key => `${key}=${params[key]}`).join("&");
 		const request = `${this.apiURL}?${requestParams}`;
 		console.log(`Calling API: ${request}`);
-		const sentJSONP = this.$http.jsonp(request);
-		console.log("sent JSONP:");
-		console.log(sentJSONP);
-		return sentJSONP;
+		return this.$http.get(request);
 	}
 	
 	initUser() {
