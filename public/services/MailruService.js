@@ -40,11 +40,13 @@ class MailruService extends BaseService {
 		params.sig = sig;
 		const requestParams = Object.keys(params).map(key => `${key}-${params[key]}`).join("&");
 		const request = `${this.apiURL}?${requestParams}`;
+		console.log(`Calling API: ${request}`);
 		return this.$http.jsonp(request);
 	}
 	
 	initUser() {
 		this.callApiMethod("users.getInfo").then(response => {
+			console.log("initUser=" + JSON.stringify(response));
 			if (response.error) {
 				this.$cookies.remove('mailru_token');
 				this.$cookies.remove("mailru_uid");
@@ -61,6 +63,7 @@ class MailruService extends BaseService {
 	
 	poll() {
 		this.callApiMethod("messages.getUnreadCount").then(response => {
+			console.log("Poll=" + JSON.stringify(response));
 			if (response.count > 0) {
 				this.$rootScope.currentDialog.service = "mailru";
 				this.$rootScope.$emit("rerenderMessages");
@@ -72,6 +75,7 @@ class MailruService extends BaseService {
 	
 	setupPoller() {
 		this.$timeout(() => this.poll(), this.pollTimeout);
+		console.log("Poller initialized");
 	}
 	
 	connect(token, uid) {
@@ -111,12 +115,14 @@ class MailruService extends BaseService {
             .then(({ token, uid }) => {
                 this.$cookies.put('mailru_token', token);
 				this.$cookies.put(`mailru_uid`, uid);
+				console.log(`Authorization successful: token=${token}, uid=${uid}`);
                 this.connect(token, uid);
             });
 	}
 	
 	getDialogMessages(thread) {
 		this.callApiMethod("messages.getThread", { uid: thread.uid }).then(response => {
+			console.log("getDialogMessages=" + JSON.stringify(response));
 			if (response.error) {
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
@@ -140,6 +146,7 @@ class MailruService extends BaseService {
 	
 	getDialogs() {
 		this.callApiMethod("messages.getThreadsList").then(response => {
+			console.log("getDialogs=" + JSON.stringify(response));
 			if (response.error) {
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
