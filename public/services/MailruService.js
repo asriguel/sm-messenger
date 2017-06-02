@@ -133,8 +133,8 @@ class MailruService extends BaseService {
 				return {
 					text: message.filtered_message,
 					date: new Date(message.time * 1000),
-					photo: isMy ? this.$rootScope.photo : thread.pic,
-					full_name: isMy ? this.$rootScope.full_name : `${thread.first_name} ${thread.last_name}`
+					photo: isMy ? this.$rootScope.mailru.photo : thread.pic,
+					full_name: isMy ? this.$rootScope.mailru.full_name : `${thread.first_name} ${thread.last_name}`
 				};
 			}).reverse();
 		});
