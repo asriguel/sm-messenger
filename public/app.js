@@ -5,6 +5,7 @@ app.config(function ($sceDelegateProvider) {
         'self',
         'https://api.vk.com/**',
         'https://**.vk.com/**',
-		'https://appsmail.ru/**',
-		'https://**.mail.ru/**']);
+		'http://appsmail.ru/**',
+		'https://**.mail.ru/**',
+		'http://**.mail.ru/**']);
 });
