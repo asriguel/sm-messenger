@@ -52,7 +52,7 @@ class MailruService extends BaseService {
 	}
 	
 	initUser() {
-		this.callApiMethod("users.getInfo").then(response => {
+		return this.callApiMethod("users.getInfo").then(response => {
 			console.log("initUser=" + JSON.stringify(response));
 			if (response.error) {
 				this.$cookies.remove('mailru_token');
