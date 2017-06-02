@@ -38,7 +38,9 @@ class MailruService extends BaseService {
 		const params = {
 			app_id: this.clientId,
 			method: methodName,
-			session_key: this.token
+			session_key: this.token,
+			secure: 0,
+			format: "json"
 		};
 		Object.keys(restParams).forEach(key => params[key] = restParams[key]);
 		const sig = this.makeSig(params);
