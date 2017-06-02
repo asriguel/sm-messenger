@@ -154,7 +154,7 @@ class MailruService extends BaseService {
 					full_name: `${thread.first_name} ${thread.last_name}`,
 					photo: thread.pic,
 					getMessages: () => this.getDialogMessages(thread),
-					sendMessage: message => this.sendDialogMessage(message),
+					sendMessage: message => this.sendDialogMessage(message, thread.uid),
 					type: "1" //TODO conversations
 				};
 			});
