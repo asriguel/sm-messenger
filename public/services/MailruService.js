@@ -82,7 +82,7 @@ class MailruService extends BaseService {
 		this.token = token;
 		this.uid = uid;
         this.connected = true;
-        this.$rootScope.$emit('updateDialogs');
+        //this.$rootScope.$emit('updateDialogs');
 		
 		this.initUser();
 		this.setupPoller();
