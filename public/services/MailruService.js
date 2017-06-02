@@ -23,9 +23,14 @@ class MailruService extends BaseService {
 	}
 	
 	makeSig(params) {
+		console.log(`Making signature from params: ${JSON.stringify(params)}`);
 		const paramString = Object.keys(params).sort().map(key => `${key}=${params[key]}`).join("");
+		console.log(`Sorted param string: ${paramString}`);
 		const sigString = `${this.uid}${paramString}${this.privateKey}`;
-		return md5(sigString);
+		console.log(`Signature string: ${sigString}`);
+		const md5sig = md5(sigString);
+		console.log(`md5: ${md5sig}`);
+		return md5sig;
 	}
 	
 	callApiMethod(methodName, restParams) {
