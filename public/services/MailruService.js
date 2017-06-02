@@ -9,7 +9,7 @@ class MailruService extends BaseService {
         this.toaster = toaster;
         this.$timeout = $timeout;
 		
-		this.apiURL = "http://www.appsmail.ru/platform/api";
+		this.apiURL = "http://appsmail.ru/platform/api";
 		this.privateKey = "	7c97f09acae3d5dede5542ffecec1f77";
 		this.pollTimeout = 5000;
 
