@@ -154,7 +154,7 @@ class MailruService extends BaseService {
 	}
 	
 	getDialogs() {
-		this.callApiMethod("messages.getThreadsList").then(response => {
+		return this.callApiMethod("messages.getThreadsList").then(response => {
 			console.log("getDialogs=" + JSON.stringify(response));
 			if (response.data.error) {
 				this.$cookies.remove("mailru_token");
