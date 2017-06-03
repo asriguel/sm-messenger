@@ -54,12 +54,12 @@ class MailruService extends BaseService {
 	initUser() {
 		return this.callApiMethod("users.getInfo").then(response => {
 			console.log("initUser=" + JSON.stringify(response));
-			if (response.error) {
+			if (response.data.error) {
 				this.$cookies.remove('mailru_token');
 				this.$cookies.remove("mailru_uid");
-				throw { service: this.name, message: response.error.error_msg };
+				throw { service: this.name, message: response.data.error.error_msg };
 			}
-			const user = response[0];
+			const user = response.data[0];
 			this.$rootScope.mailru = {
 				id: user.uid,
 				full_name: `${user.first_name} ${user.last_name}`,
@@ -75,7 +75,7 @@ class MailruService extends BaseService {
 	poll() {
 		this.callApiMethod("messages.getUnreadCount").then(response => {
 			console.log("Poll=" + JSON.stringify(response));
-			if (response.count > 0) {
+			if (response.data.count > 0) {
 				this.$rootScope.currentDialog.service = "mailru";
 				this.$rootScope.$emit("rerenderMessages");
 				this.$rootScope.$emit("scrollBottom");
@@ -133,12 +133,12 @@ class MailruService extends BaseService {
 	getDialogMessages(thread) {
 		this.callApiMethod("messages.getThread", { uid: thread.uid }).then(response => {
 			console.log("getDialogMessages=" + JSON.stringify(response));
-			if (response.error) {
+			if (response.data.error) {
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
-				throw { service: this.name, message: response.error.error_msg };
+				throw { service: this.name, message: response.data.error.error_msg };
 			}
-			return response.map(message => {
+			return response.data.map(message => {
 				const isMy = message.type === 1;
 				return {
 					text: message.filtered_message,
@@ -157,12 +157,12 @@ class MailruService extends BaseService {
 	getDialogs() {
 		this.callApiMethod("messages.getThreadsList").then(response => {
 			console.log("getDialogs=" + JSON.stringify(response));
-			if (response.error) {
+			if (response.data.error) {
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
-				throw { service: this.name, message: response.error.error_msg };
+				throw { service: this.name, message: response.data.error.error_msg };
 			}
-			return dialogs = response.map(thread => {
+			return dialogs = response.data.map(thread => {
 				return {
 					service: "mailru",
 					unread: Boolean(thread.unread),
