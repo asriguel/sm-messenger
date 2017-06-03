@@ -84,7 +84,7 @@ class MailruService extends BaseService {
 	}
 	
 	setupPoller() {
-		this.$timeout(() => this.poll(), this.pollTimeout);
+		setInterval(() => this.poll(), this.pollTimeout);
 		console.log("Poller initialized");
 	}
 	
