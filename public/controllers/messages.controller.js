@@ -13,11 +13,11 @@ app
     let services = [vkService, mailruService];
 
     this.updateDialogs = () => {
+		this.dialogs = [];
         services.forEach((service) => {
             if (service.connected) {
                 service.getDialogs()
                     .then(dialogs => {
-                        this.dialogs = [];
                         this.dialogs = this.dialogs.concat(dialogs);
                     })
                     .catch(err => toaster.pop('error', err.service, err.message));
