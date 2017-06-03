@@ -163,7 +163,7 @@ class MailruService extends BaseService {
 				this.$cookies.remove("mailru_uid");
 				throw { service: this.name, message: response.data.error.error_msg };
 			}
-			return dialogs = response.data.map(thread => {
+			return response.data.map(thread => {
 				console.log(`Processing thread: ${JSON.stringify(thread)}`);
 				return {
 					service: "mailru",
