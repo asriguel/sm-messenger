@@ -14,22 +14,23 @@ app
 
     this.updateDialogs = () => {
 		this.dialogs = [];
-        services.forEach((service) => {
-            if (service.connected) {
+		Promise.all(services.map(service => {
+			if (service.connected) {
 				console.log(`Connected service ${service.name}`);
 				console.log(`has getDialogs: ${typeof service.getDialogs}`);
 				const dialogPromise = service.getDialogs();
-                dialogPromise
+                return dialogPromise
                     .then(dialogs => {
 						console.log(`Got dialogs: ${JSON.stringify(dialogs)}`);
                         this.dialogs = this.dialogs.concat(dialogs);
                     })
                     .catch(err => toaster.pop('error', err.service, err.message));
             }
-        });
-		$rootScope.currentDialog = $rootScope.currentDialog || this.dialogs[0];
-		console.log(`Summary dialogs after update: ${JSON.stringify(this.dialogs)}`);
-		console.log(`Current dialog: ${JSON.stringify($rootScope.currentDialog)}`);
+		})).then(() => {
+			$rootScope.currentDialog = $rootScope.currentDialog || this.dialogs[0];
+			console.log(`Summary dialogs after update: ${JSON.stringify(this.dialogs)}`);
+			console.log(`Current dialog: ${JSON.stringify($rootScope.currentDialog)}`);
+		});
     };
     this.updateDialogs();
 
