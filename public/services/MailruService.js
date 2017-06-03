@@ -142,8 +142,8 @@ class MailruService extends BaseService {
 				return {
 					text: message.filtered_message,
 					date: new Date(message.time * 1000),
-					photo: isMy ? this.$rootScope.mailru.photo : thread.pic,
-					full_name: isMy ? this.$rootScope.mailru.full_name : `${thread.first_name} ${thread.last_name}`
+					photo: isMy ? this.$rootScope.mailru.photo : thread.user.pic,
+					full_name: isMy ? this.$rootScope.mailru.full_name : `${thread.user.first_name} ${thread.user.last_name}`
 				};
 			}).reverse();
 		});
@@ -168,8 +168,8 @@ class MailruService extends BaseService {
 					unread: Boolean(thread.unread),
 					date: new Date(thread.time * 1000),
 					user_id: thread.uid,
-					full_name: `${thread.first_name} ${thread.last_name}`,
-					photo: thread.pic,
+					full_name: `${thread.user.first_name} ${thread.user.last_name}`,
+					photo: thread.user.pic,
 					getMessages: () => this.getDialogMessages(thread),
 					sendMessage: message => this.sendDialogMessage(message, thread.uid),
 					type: "1" //TODO conversations
