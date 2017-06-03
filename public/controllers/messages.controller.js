@@ -16,6 +16,7 @@ app
 		this.dialogs = [];
         services.forEach((service) => {
             if (service.connected) {
+				console.log(`Connected service ${JSON.stringify(service)}`);
                 service.getDialogs()
                     .then(dialogs => {
 						console.log(`Got dialogs: ${JSON.stringify(dialogs)}`);
