@@ -11,7 +11,7 @@ class MailruService extends BaseService {
 		
 		this.apiURL = "http://appsmail.ru/platform/api";
 		this.privateKey = "7c97f09acae3d5dede5542ffecec1f77";
-		this.pollTimeout = 5000;
+		this.pollTimeout = 30000;
 
         if ($cookies.get('mailru_token')) {
             this.connect($cookies.get('mailru_token'));
