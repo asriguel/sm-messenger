@@ -75,13 +75,11 @@ class MailruService extends BaseService {
 	poll() {
 		this.callApiMethod("messages.getUnreadCount").then(response => {
 			console.log("Poll=" + JSON.stringify(response));
-			if (response.data.count > 0) {
-				if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "mailru") {
-					this.$rootScope.$emit("rerenderMessages");
-					this.$rootScope.$emit("scrollBottom");
-				}
-				this.$rootScope.$emit("updateDialogs");
+			if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "mailru") {
+				this.$rootScope.$emit("rerenderMessages");
+				this.$rootScope.$emit("scrollBottom");
 			}
+			this.$rootScope.$emit("updateDialogs");
 		});
 	}
 	
