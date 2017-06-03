@@ -138,7 +138,7 @@ class MailruService extends BaseService {
 			}
 			return response.data.map(message => {
 				console.log(`Processing message: ${JSON.stringify(message)}`);
-				const isMy = message.type === 1;
+				const isMy = message.type === 0;
 				return {
 					text: message.message.map(msg => String(msg.content)).join(""),
 					date: new Date(message.time * 1000),
