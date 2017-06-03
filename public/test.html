@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Mail.ru service test page</title>
+		<meta charset="UTF-8">
+		<script src="http://cdn.connect.mail.ru/js/loader.js"></script>
+		<script src="bower_components/blueimp-md5/js/md5.min.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const app_id = "754333";
+				const private_key = "2ec1efd031475b91be6bfc7e15781c95";
+				const uid = "17264559867578987766";
+				const apiURL = "http://appsmail.ru/platform/api";
+				
+				mailru.loader.require("api", () => {
+					mailru.connect.init(app_id, private_key);
+					mailru.events.listen(mailru.connect.events.login, () => window.location.reload());
+					mailru.connect.getLoginStatus(status => {
+						console.log(JSON.stringify(status));
+						if (status.is_app_user !== "1") {
+							const mailruButton = document.createElement("a");
+							mailruButton.className = "mrc__connectButton";
+							document.body.appendChild(mailruButton);
+							mailru.connect.initButton();
+						}
+						else {
+							const { session_key, vid: uid } = status;
+							console.log(`session_key: ${session_key}`);
+							console.log(`UID: ${uid}`);
+							const apiURL = "http://appsmail.ru/platform/api";
+							const requestParams = {
+								app_id,
+								session_key,
+								method: "users.getInfo",
+								secure: 0,
+								format: "json"
+							};
+							const sigSrc = `${uid}${Object.keys(requestParams).sort().map(key => `${key}=${requestParams[key]}`).join("")}${private_key}`;
+							console.log(sigSrc);
+							const signature = md5(sigSrc);
+							requestParams.sig = signature;
+							const requestString = Object.keys(requestParams).map(key => `${key}=${encodeURIComponent(requestParams[key])}`).join("&");
+							const requestURL = `${apiURL}?${requestString}`;
+							console.log(`xhr: ${requestURL}`);
+							const xhr = new XMLHttpRequest();
+							xhr.open("GET", requestURL, true);
+							xhr.onload = () => {
+								console.log(`Response type: ${xhr.responseType}`);
+								console.log(`Response: ${xhr.response}`);
+							};
+							xhr.send();
+						}
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
