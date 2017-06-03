@@ -16,8 +16,10 @@ app
 		this.dialogs = [];
         services.forEach((service) => {
             if (service.connected) {
-				console.log(`Connected service ${JSON.stringify(service)}`);
-                service.getDialogs()
+				console.log(`Connected service ${service.name}`);
+				console.log(`has getDialogs: ${typeof service.getDialogs}`);
+				const dialogPromise = service.getDialogs();
+                dialogPromise
                     .then(dialogs => {
 						console.log(`Got dialogs: ${JSON.stringify(dialogs)}`);
                         this.dialogs = this.dialogs.concat(dialogs);
