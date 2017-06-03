@@ -140,7 +140,7 @@ class MailruService extends BaseService {
 				console.log(`Processing message: ${JSON.stringify(message)}`);
 				const isMy = message.type === 1;
 				return {
-					text: message.filtered_message,
+					text: message.message.content,
 					date: new Date(message.time * 1000),
 					photo: isMy ? this.$rootScope.mailru.photo : thread.user.pic,
 					full_name: isMy ? this.$rootScope.mailru.full_name : `${thread.user.first_name} ${thread.user.last_name}`
