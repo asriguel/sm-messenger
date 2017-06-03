@@ -23,6 +23,7 @@ app
                     .catch(err => toaster.pop('error', err.service, err.message));
             }
         });
+		$rootScope.currentDialog = $rootScope.currentDialog || this.dialogs[0];
     };
     this.updateDialogs();
 
