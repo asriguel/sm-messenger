@@ -129,7 +129,7 @@ class MailruService extends BaseService {
 	}
 	
 	getDialogMessages(thread) {
-		this.callApiMethod("messages.getThread", { uid: thread.uid }).then(response => {
+		return this.callApiMethod("messages.getThread", { uid: thread.uid }).then(response => {
 			console.log("getDialogMessages=" + JSON.stringify(response));
 			if (response.data.error) {
 				this.$cookies.remove("mailru_token");
@@ -150,7 +150,7 @@ class MailruService extends BaseService {
 	}
 	
 	sendDialogMessage(message, uid) {
-		this.callApiMethod("messages.post", { uid, message });
+		return this.callApiMethod("messages.post", { uid, message });
 	}
 	
 	getDialogs() {
