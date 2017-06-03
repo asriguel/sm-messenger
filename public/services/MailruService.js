@@ -139,6 +139,7 @@ class MailruService extends BaseService {
 				throw { service: this.name, message: response.data.error.error_msg };
 			}
 			return response.data.map(message => {
+				console.log(`Processing message: ${JSON.stringify(message)}`);
 				const isMy = message.type === 1;
 				return {
 					text: message.filtered_message,
@@ -163,6 +164,7 @@ class MailruService extends BaseService {
 				throw { service: this.name, message: response.data.error.error_msg };
 			}
 			return dialogs = response.data.map(thread => {
+				console.log(`Processing thread: ${JSON.stringify(thread)}`);
 				return {
 					service: "mailru",
 					unread: Boolean(thread.unread),
