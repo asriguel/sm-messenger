@@ -129,7 +129,7 @@ class MailruService extends BaseService {
 	}
 	
 	getDialogMessages(thread) {
-		return this.callApiMethod("messages.getThread", { uid: thread.uid }).then(response => {
+		return this.callApiMethod("messages.getThread", { uid: thread.user.uid }).then(response => {
 			console.log("getDialogMessages=" + JSON.stringify(response));
 			if (response.data.error) {
 				this.$cookies.remove("mailru_token");
@@ -167,11 +167,11 @@ class MailruService extends BaseService {
 					service: "mailru",
 					unread: Boolean(thread.unread),
 					date: new Date(thread.time * 1000),
-					user_id: thread.uid,
+					user_id: thread.user.uid,
 					full_name: `${thread.user.first_name} ${thread.user.last_name}`,
 					photo: thread.user.pic,
 					getMessages: () => this.getDialogMessages(thread),
-					sendMessage: message => this.sendDialogMessage(message, thread.uid),
+					sendMessage: message => this.sendDialogMessage(message, thread.user.uid),
 					type: "1" //TODO conversations
 				};
 			});
