@@ -50,8 +50,8 @@ class VkService extends BaseService {
                                         this.$http.jsonp(`https://api.vk.com/method/users.get?access_token=${this.token}&user_ids=${update[3]}`)
                                             .then(response => this.toaster.pop('success', response.data.response[0].first_name + ' ' + response.data.response[0].last_name, update[6]));
 
-                                        if ((this.$rootScope.currentDialog.service = 'vk' && this.$rootScope.currentDialog.type == '1' && this.$rootScope.currentDialog.user_id == update[3])
-                                            || (this.$rootScope.currentDialog.service = 'vk' && this.$rootScope.currentDialog.type == '2' && this.$rootScope.currentDialog.chat_id == update[3])) {
+                                        if ((this.$rootScope.currentDialog.service === 'vk' && this.$rootScope.currentDialog.type == '1' && this.$rootScope.currentDialog.user_id == update[3])
+                                            || (this.$rootScope.currentDialog.service === 'vk' && this.$rootScope.currentDialog.type == '2' && this.$rootScope.currentDialog.chat_id == update[3])) {
                                             this.$rootScope.$emit('rerenderMessages');
                                             this.$rootScope.$emit('scrollBottom');
                                         }
