@@ -94,9 +94,8 @@ class MailruService extends BaseService {
 		this.token = token;
 		this.uid = uid;
         this.connected = true;
-        //this.$rootScope.$emit('updateDialogs');
 		
-		return this.initUser().then(() => this.setupPoller());
+		return this.initUser().then(() => this.setupPoller()).then(() => this.$rootScope.$emit("updateDialogs"));
 	}
 	
 	auth() {
