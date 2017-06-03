@@ -18,12 +18,15 @@ app
             if (service.connected) {
                 service.getDialogs()
                     .then(dialogs => {
+						console.log(`Got dialogs: ${JSON.stringify(dialogs)}`);
                         this.dialogs = this.dialogs.concat(dialogs);
                     })
                     .catch(err => toaster.pop('error', err.service, err.message));
             }
         });
 		$rootScope.currentDialog = $rootScope.currentDialog || this.dialogs[0];
+		console.log(`Summary dialogs after update: ${JSON.stringify(this.dialogs)}`);
+		console.log(`Current dialog: ${JSON.stringify($rootScope.currentDialog)}`);
     };
     this.updateDialogs();
 
