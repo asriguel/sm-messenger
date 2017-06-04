@@ -52,7 +52,7 @@
             </span>
     <ul class="friend-list">
         <li class="bounceInDown" ng-repeat="dialog in msgsCtrl.dialogs" ng-class="{'active': dialog.unread}">
-            <a href="#" class="clearfix" ng-click="msgsCtrl.rerenderMessages(dialog)">
+            <a href="#" class="clearfix" ng-click="msgsCtrl.setCurrentDialog(dialog)">
                 <img ng-src="{{dialog.photo}}" alt="" class="img-circle">
                 <div class="friend-name" ng-switch="dialog.type">
                     <strong ng-bind="dialog.full_name" ng-switch-when="1"></strong>
@@ -85,6 +85,6 @@
         </li>
     </ul>
 </div>
-<textarea id="msgbox" class="col-md-9" ng-model="message" ng-textarea-enter="msgsCtrl.textareaAction()" placeholder="Type message"></textarea>
+<textarea id="msgbox" class="col-md-9" ng-model="message" ng-textarea-enter="msgsCtrl.sendMessage()" placeholder="Type message"></textarea>
 </body>
 </html>
