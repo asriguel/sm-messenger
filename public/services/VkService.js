@@ -24,7 +24,7 @@ class VkService extends BaseService {
 	makeRequestString(params, withToken) {
 		params = params || {};
 		withToken = withToken == null ? true : Boolean(withToken);
-		const request = Object.assign({}, params, { access_token: this.token });
+		const request = Object.assign({}, params, withToken ? { access_token: this.token } : {});
 		return Object.keys(request).map(key => `${key}=${request[key]}`).join("&");
 	}
 	
