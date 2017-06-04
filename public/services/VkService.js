@@ -98,6 +98,11 @@ class VkService extends BaseService {
 	processUpdates(updates) {
 		return Promise.all(updates.map(update => this.processUpdate(update)));
 	}
+	
+	initPoller() {
+		const poller = this.makePoller();
+		setInterval(() => poller(), this.pollTimeout);
+	}
 
     connect(token) {
         this.token = token;
@@ -108,6 +113,7 @@ class VkService extends BaseService {
 				full_name: user.first_name + ' ' + user.last_name,
 				photo: user.photo
 			};
+			this.initPoller();
 		});
     }
 
