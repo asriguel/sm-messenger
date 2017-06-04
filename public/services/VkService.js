@@ -197,7 +197,10 @@ class VkService extends BaseService {
 	
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
-			({ response: { items } }) => Promise.all(items.map(item => this.getDialog(item)))
+			({ response }) => {
+				console.log(`Got dialogs: ${JSON.stringify(response)}`);
+				return Promise.all(response.items.map(item => this.getDialog(item)));
+			}
 		);
 	}
 }
