@@ -100,8 +100,9 @@ class VkService extends BaseService {
 	}
 	
 	initPoller() {
-		const poller = this.makePoller();
-		setInterval(() => poller(), this.pollTimeout);
+		return this.makePoller().then(poller => {
+			setInterval(() => poller(), this.pollTimeout);
+		});
 	}
 
     connect(token) {
@@ -113,7 +114,7 @@ class VkService extends BaseService {
 				full_name: user.first_name + ' ' + user.last_name,
 				photo: user.photo
 			};
-			this.initPoller();
+			return this.initPoller();
 		});
     }
 
