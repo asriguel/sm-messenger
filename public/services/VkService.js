@@ -160,8 +160,9 @@ class VkService extends BaseService {
 	
 	getDialogMessages(dialog) {
 		return this.callApiMethod("messages.getHistory", { user_id: dialog.id }).then(
-			({ response: { items } }) => {
-				return Promise.all(items.map(item => this.getMessage(item)));
+			({ response }) => {
+				console.log(`Got dialog messages: ${response}`);
+				return Promise.all(response.items.map(item => this.getMessage(item)));
 			}
 		);
 	}
@@ -198,8 +199,8 @@ class VkService extends BaseService {
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
 			({ response }) => {
-				console.log(`Got dialogs: ${JSON.stringify(response)}`);
-				return Promise.all(response.items.map(item => this.getDialog(item)));
+				response.shift();
+				return Promise.all(response.map(item => this.getDialog(item)));
 			}
 		);
 	}
