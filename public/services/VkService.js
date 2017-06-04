@@ -169,7 +169,7 @@ class VkService extends BaseService {
                     user_ids.push(dialog.uid);
                 });
 
-				return Promise.all([ this.callApiMethod("uses.get", { user_ids, fields: "photo_50" }), dialogs ]);
+				return Promise.all([ this.callApiMethod("uses.get", { user_ids: user_ids.join(","), fields: "photo_50" }), dialogs ]);
             })
             .then(([usersData, dialogs]) => {
                 dialogs.forEach(dialog => {
@@ -212,7 +212,7 @@ class VkService extends BaseService {
                                 });
 
 								return Promise.all([
-									user_ids.length ? this.callApiMethod("users.get", { user_ids, fields: "photo_50" }) : false,
+									user_ids.length ? this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }) : false,
 									messages
 								]);
                             })
