@@ -61,7 +61,7 @@ class MailruService extends BaseService {
 		console.log(`Initializing mail.ru user`);
 		return this.callApiMethod("users.getInfo").then(response => {
 			if (response.data.error) {
-				console.err(`Failed to initialize mail.ru user: ${JSON.stringify(response.data.error)}`);
+				console.error(`Failed to initialize mail.ru user: ${JSON.stringify(response.data.error)}`);
 				this.$cookies.remove('mailru_token');
 				this.$cookies.remove("mailru_uid");
 				throw { service: this.name, message: response.data.error.error_msg };

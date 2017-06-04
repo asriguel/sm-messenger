@@ -139,7 +139,7 @@ class VkService extends BaseService {
         return this.callApiMethod("messages.getDialogs")
             .then(response => {
                 if (response.data.error) {
-					console.err(`Failed to get dialogs VK: ${JSON.stringify(response.data.error)}`);
+					console.error(`Failed to get dialogs VK: ${JSON.stringify(response.data.error)}`);
                     this.$cookies.remove('vk_token');
                     throw {service: 'VKontakte', message: response.data.error.error_msg};
                 }
@@ -181,7 +181,7 @@ class VkService extends BaseService {
 						return this.callApiMethod("messages.getHistory", { [ idName ]: dialog[idName] })
                             .then(response => {
                                 if (response.data.error) {
-									console.err(`Failed to get history VK: ${JSON.stringify(response.data.error)}`);
+									console.error(`Failed to get history VK: ${JSON.stringify(response.data.error)}`);
                                     this.$cookies.remove('vk_token');
                                     throw {service: 'VKontakte', message: response.data.error.error_msg};
                                 }
