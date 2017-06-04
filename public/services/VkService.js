@@ -180,7 +180,7 @@ class VkService extends BaseService {
 			unread: !read_state,
 			date: new Date(date * 1000),
 			type: item.chat_id ? 2 : 1,
-			id: dialog.chat_id ? item.chat_id : item.user_id
+			id: item.chat_id ? item.chat_id : item.user_id
 		};
 		if (item.chat_id) {
 			dialog.chat_title = item.title;
