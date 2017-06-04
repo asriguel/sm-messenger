@@ -58,6 +58,7 @@ class VkService extends BaseService {
 					`https://${server}`,
 					Object.assign({}, this.pollConfig, { ts, key })
 				);
+				console.log(`Polling URL: ${url}`);
 				return this.$http.get(url).then(
 					({ data }) => {
 						if (data.failed) {
@@ -66,6 +67,7 @@ class VkService extends BaseService {
 								message: `polling failed due to: ${data.failed}`
 							};
 						}
+						console.log(`Polled data: ${JSON.stringify(data)}`);
 						return this.processUpdates(data.updates).then(() => ts = data.ts);
 					}
 				);
@@ -114,6 +116,7 @@ class VkService extends BaseService {
 				full_name: user.first_name + ' ' + user.last_name,
 				photo: user.photo
 			};
+			console.log(`Connect successful: ${JSON.stringify(this.$rootScope.vk)}`);
 			return this.initPoller();
 		});
     }
