@@ -14,7 +14,7 @@ class MailruService extends BaseService {
 		this.pollTimeout = 30000;
 
         if ($cookies.get('mailru_token')) {
-            this.connect($cookies.get('mailru_token'));
+            this.connect($cookies.get('mailru_token'), $cookies.get("mailru_uid"));
         }
     }
 	
