@@ -12,25 +12,31 @@ class MailruService extends BaseService {
 		this.apiURL = "http://appsmail.ru/platform/api";
 		this.privateKey = "7c97f09acae3d5dede5542ffecec1f77";
 		this.pollTimeout = 30000;
-
-        if ($cookies.get('mailru_token')) {
-            this.connect($cookies.get('mailru_token'), $cookies.get("mailru_uid"));
-        }
+		
+		console.log(`Mail.ru service successfully set up`);
+		this.restoreSession();
     }
+	
+	restoreSession() {
+		console.log(`Attempting to restore previous authorized mail.ru session`);
+		const session_key = this.$cookies.get("mailru_token"), uid = this.$cookies.get("mailru_uid");
+		if (session_key && uid) {
+			console.log(`Mail.ru session key & uid restored from cookies: session_key=${session_key}, uid=${uid}`);
+            this.connect(session_key, uid);
+        }
+		else {
+			console.log(`No previous mail.ru session restored`);
+		}
+	}
 	
 	setClientId(clientId) {
 		this.clientId = clientId;
 	}
 	
 	makeSig(params) {
-		console.log(`Making signature from params: ${JSON.stringify(params)}`);
 		const paramString = Object.keys(params).sort().map(key => `${key}=${params[key]}`).join("");
-		console.log(`Sorted param string: ${paramString}`);
 		const sigString = `${this.uid}${paramString}${this.privateKey}`;
-		console.log(`Signature string: ${sigString}`);
-		const md5sig = md5(sigString);
-		console.log(`md5: ${md5sig}`);
-		return md5sig;
+		return md5(sigString);
 	}
 	
 	callApiMethod(methodName, restParams) {
@@ -47,19 +53,21 @@ class MailruService extends BaseService {
 		params.sig = sig;
 		const requestParams = Object.keys(params).map(key => `${key}=${params[key]}`).join("&");
 		const request = `${this.apiURL}?${requestParams}`;
-		console.log(`Calling API: ${request}`);
+		console.log(`Calling mail.ru API method ${methodName}: ${request}`);
 		return this.$http.get(request);
 	}
 	
 	initUser() {
+		console.log(`Initializing mail.ru user`);
 		return this.callApiMethod("users.getInfo").then(response => {
-			console.log("initUser=" + JSON.stringify(response));
 			if (response.data.error) {
+				console.err(`Failed to initialize mail.ru user: ${JSON.stringify(response.data.error)}`);
 				this.$cookies.remove('mailru_token');
 				this.$cookies.remove("mailru_uid");
 				throw { service: this.name, message: response.data.error.error_msg };
 			}
 			const user = response.data[0];
+			console.log(`mail.ru user: ${JSON.stringify(user)}`);
 			this.$rootScope.mailru = {
 				id: user.uid,
 				full_name: `${user.first_name} ${user.last_name}`,
@@ -73,14 +81,13 @@ class MailruService extends BaseService {
 	}
 	
 	poll() {
-		this.callApiMethod("messages.getUnreadCount").then(response => {
-			console.log("Poll=" + JSON.stringify(response));
-			if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "mailru") {
-				this.$rootScope.$emit("rerenderMessages");
-				this.$rootScope.$emit("scrollBottom");
-			}
-			this.$rootScope.$emit("updateDialogs");
-		});
+		console.log(`Polling...`);
+		if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "mailru") {
+			console.log(`Current dialog belongs to mail.ru`);
+			this.$rootScope.$emit("rerenderMessages");
+			this.$rootScope.$emit("scrollBottom");
+		}
+		this.$rootScope.$emit("updateDialogs");
 	}
 	
 	setupPoller() {
@@ -93,6 +100,7 @@ class MailruService extends BaseService {
 		this.uid = uid;
         this.connected = true;
 		
+		console.log(`Connecting to mail.ru...`);
 		return this.initUser().then(() => this.setupPoller()).then(() => this.$rootScope.$emit("updateDialogs"));
 	}
 	
@@ -130,8 +138,8 @@ class MailruService extends BaseService {
 	
 	getDialogMessages(thread) {
 		return this.callApiMethod("messages.getThread", { uid: thread.user.uid }).then(response => {
-			console.log("getDialogMessages=" + JSON.stringify(response));
 			if (response.data.error) {
+				console.log(`Failed to load dialog messages: ${JSON.stringify(response.data.error)}`);
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
 				throw { service: this.name, message: response.data.error.error_msg };
@@ -150,13 +158,14 @@ class MailruService extends BaseService {
 	}
 	
 	sendDialogMessage(message, uid) {
+		console.log(`Sending message ${JSON.stringify(message)} to user ${uid}`);
 		return this.callApiMethod("messages.post", { uid, message });
 	}
 	
 	getDialogs() {
 		return this.callApiMethod("messages.getThreadsList").then(response => {
-			console.log("getDialogs=" + JSON.stringify(response));
 			if (response.data.error) {
+				console.log(`Failed to load dialogs: ${JSON.stringify(response.data.error)}`);
 				this.$cookies.remove("mailru_token");
 				this.$cookies.remove("mailru_uid");
 				throw { service: this.name, message: response.data.error.error_msg };
