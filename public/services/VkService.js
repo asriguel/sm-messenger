@@ -21,8 +21,9 @@ class VkService extends BaseService {
         this.clientId = clientId;
     }
 	
-	makeRequestString(params) {
+	makeRequestString(params, withToken) {
 		params = params || {};
+		withToken = withToken == null ? true : Boolean(withToken);
 		const request = Object.assign({}, params, { access_token: this.token });
 		return Object.keys(request).map(key => `${key}=${request[key]}`).join("&");
 	}
@@ -116,7 +117,7 @@ class VkService extends BaseService {
 			client_id: this.clientId,
 			display: "page",
 			redirect_uri: "https://oauth.vk.com/blank.html&scope=messages&response_type=token"
-		});
+		}, false);
 		const url = `${authURL}?${requestString}`;
         this.$window.open(url, '_blank');
         let authModal = this.$uibModal.open({
