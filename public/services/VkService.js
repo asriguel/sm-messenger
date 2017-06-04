@@ -102,7 +102,7 @@ class VkService extends BaseService {
 
         this.callApiMethod("messages.getLongPollServer")
             .then(response => {
-				let { ts, server, key } = response;
+				let { ts, server, key } = response.data.response;
                 setInterval(() => {
 					this.poll(ts, server, key).then(newTs => ts = newTs);
 				}, this.pollTimeout);
