@@ -8,6 +8,9 @@ class VkService extends BaseService {
         this.$cookies = $cookies;
         this.toaster = toaster;
         this.$timeout = $timeout;
+		
+		this.apiURL = "https://api.vk.com/method";
+		this.pollTimeout = 1000;
 
         if ($cookies.get('vk_token')) {
             this.connect($cookies.get('vk_token'));
@@ -17,61 +20,105 @@ class VkService extends BaseService {
     setClientId(clientId) {
         this.clientId = clientId;
     }
+	
+	makeRequestString(params) {
+		params = params || {};
+		const request = Object.assign({}, params, { access_token: this.token });
+		return Object.keys(request).map(key => `${key}=${request[key]}`).join("&");
+	}
+	
+	callApiMethod(methodName, params) {
+		const requestString = this.makeRequestString(params);
+		const url = `${this.apiURL}/${methodName}?${requestString}`;
+		return this.$http.jsonp(url);
+	}
+	
+	poll(ts, server, key) {
+		const requestString = this.makeRequestString({ act: "a_check", key, ts, wait: 25, mode: 2, version: 1 });
+		const url = `https://${server}?${requestString}`;
+		return this.$http.get(url).then(response => {
+			response.data.updates.forEach(update => {
+				if (update[0] == 4) {
+					if (update[2] != 35 && update[3] != this.$rootScope.vk.id) {
+						this.callApiMethod("users.get", { user_ids: update[3] })
+							.then(([ { first_name, last_name } ]) => {
+								console.log(`Poll update VK: first_name=${first_name}, last_name=${last_name}`);
+								this.toaster.pop('success', first_name + ' ' + last_name, update[6]);
+							});
+						
+						if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "vk") {
+							console.log(`Current dialog belongs to VK`);
+							const { type } = this.$rootScope.currentDialog;
+							let idName;
+							if (type == "1") {
+								idName = "user_id";
+							}
+							else if (type == "2") {
+								idName = "chat_id";
+							}
+							const id = this.$rootScope.currentDialog[idName];
+							if (id == update[3]) {
+								console.log(`Rerendering current VK dialog`);
+								this.$rootScope.$emit('rerenderMessages');
+								this.$rootScope.$emit('scrollBottom');
+							}
+						}
+					}
+					this.$rootScope.$emit('updateDialogs');
+				}
+			});
+			return response.data.ts;
+		}).catch(err => {
+			console.log(`Poll failed:`);
+			console.log(err);
+		});
+	}
 
     connect(token) {
         this.token = token;
         this.connected = true;
         this.$rootScope.$emit('updateDialogs');
 
-        this.$http.jsonp(`https://api.vk.com/method/users.get?access_token=${this.token}&fields=photo_50`)
+		this.callApiMethod("users.get", { "fields": "photo_50" })
             .then(response => {
                 if (response.data.error) {
                     this.$cookies.remove('vk_token');
                     throw {service: 'VKontakte', message: response.data.error.error_msg};
                 }
 
-                let user = response.data.response[0];
-                this.$rootScope.vk = {};
-                this.$rootScope.vk.id = user.uid;
-                this.$rootScope.vk.full_name = user.first_name + ' ' + user.last_name;
-                this.$rootScope.vk.photo = user.photo_50;
+                const user = response.data.response[0];
+				console.log(`VK user: ${JSON.stringify(user)}`);
+                this.$rootScope.vk = {
+					id: user.uid,
+					full_name: user.first_name + ' ' + user.last_name,
+					photo: user.photo
+				};
             })
             .catch(err => this.toaster.pop('error', err.service, err.message));
 
-        this.$http.jsonp(`https://api.vk.com/method/messages.getLongPollServer?access_token=${this.token}`)
+        this.callApiMethod("messages.getLongPollServer")
             .then(response => {
-                let ts = response.data.response.ts;
-                let poller = () => {
-                    this.$http.get(`https://${response.data.response.server}?act=a_check&key=${response.data.response.key}&ts=${ts}&wait=25&mode=2&version=1`)
-                        .then(response => {
-                            response.data.updates.forEach(update => {
-                                if (update[0] == 4) {
-                                    if (update[2] != 35 && update[3] != this.$rootScope.vk.id) {
-                                        this.$http.jsonp(`https://api.vk.com/method/users.get?access_token=${this.token}&user_ids=${update[3]}`)
-                                            .then(response => this.toaster.pop('success', response.data.response[0].first_name + ' ' + response.data.response[0].last_name, update[6]));
-
-                                        if ((this.$rootScope.currentDialog.service === 'vk' && this.$rootScope.currentDialog.type == '1' && this.$rootScope.currentDialog.user_id == update[3])
-                                            || (this.$rootScope.currentDialog.service === 'vk' && this.$rootScope.currentDialog.type == '2' && this.$rootScope.currentDialog.chat_id == update[3])) {
-                                            this.$rootScope.$emit('rerenderMessages');
-                                            this.$rootScope.$emit('scrollBottom');
-                                        }
-                                    }
-                                    this.$rootScope.$emit('updateDialogs');
-                                }
-                            });
-                            ts = response.data.ts;
-                            this.$timeout(poller, 1000);
-                        })
-                        .catch(() => {
-                        });
-                };
-                poller();
+				let { ts, server, key } = response;
+                setInterval(() => {
+					this.poll(ts, server, key).then(newTs => ts = newTs);
+				}, this.pollTimeout);
             })
-            .catch(err => this.toaster.pop('error', err.service, err.message));
+            .catch(err => {
+				console.log(`VK getLongPollServer failed:`);
+				console.log(err);
+				this.toaster.pop('error', err.service, err.message);
+			});
     }
 
     auth() {
-        this.$window.open(`https://oauth.vk.com/authorize?client_id=${this.clientId}&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=messages&response_type=token`, '_blank');
+		const authURL = "https://oauth.vk.com/authorize";
+		const requestString = this.makeRequestString({
+			client_id: this.clientId,
+			display: "page",
+			redirect_uri: "https://oauth.vk.com/blank.html&scope=messages&response_type=token"
+		});
+		const url = `${authURL}?${requestString}`;
+        this.$window.open(url, '_blank');
         let authModal = this.$uibModal.open({
             templateUrl: 'assets/html/vkAuthModal.html',
             controller: function ($scope, $uibModalInstance) {
@@ -81,15 +128,17 @@ class VkService extends BaseService {
         });
         authModal.result
             .then((token) => {
+				console.log(`Authorization VK successful: token=${token}`);
                 this.$cookies.put('vk_token', token);
                 this.connect(token);
             });
     }
 
     getDialogs() {
-        return this.$http.jsonp(`https://api.vk.com/method/messages.getDialogs?access_token=${this.token}`)
+        return this.callApiMethod("messages.getDialogs")
             .then(response => {
                 if (response.data.error) {
+					console.err(`Failed to get dialogs VK: ${JSON.stringify(response.data.error)}`);
                     this.$cookies.remove('vk_token');
                     throw {service: 'VKontakte', message: response.data.error.error_msg};
                 }
@@ -119,7 +168,7 @@ class VkService extends BaseService {
                     user_ids.push(dialog.uid);
                 });
 
-                return Promise.all([this.$http.jsonp(`https://api.vk.com/method/users.get?access_token=${this.token}&user_ids=${user_ids}&fields=photo_50`), dialogs]);
+				return Promise.all([ this.callApiMethod("uses.get", { user_ids, fields: "photo_50" }), dialogs ]);
             })
             .then(([usersData, dialogs]) => {
                 dialogs.forEach(dialog => {
@@ -127,10 +176,11 @@ class VkService extends BaseService {
                     dialog.full_name = user.first_name + ' ' + user.last_name;
                     dialog.photo = user.photo_50;
                     dialog.getMessages = (offset) => {
-                        let urlId = (dialog.type == '1') ? `user_id=${dialog.user_id}` : `chat_id=${dialog.chat_id}`;
-                        return this.$http.jsonp(`https://api.vk.com/method/messages.getHistory?access_token=${this.token}&${urlId}`)
+						const idName = dialog.type == "1" ? "user_id" : "chat_id";
+						return this.callApiMethod("messages.getHistory", { [ idName ]: dialog[idName] })
                             .then(response => {
                                 if (response.data.error) {
+									console.err(`Failed to get history VK: ${JSON.stringify(response.data.error)}`);
                                     this.$cookies.remove('vk_token');
                                     throw {service: 'VKontakte', message: response.data.error.error_msg};
                                 }
@@ -160,7 +210,10 @@ class VkService extends BaseService {
                                     });
                                 });
 
-                                return Promise.all([(user_ids.length) ? this.$http.jsonp(`https://api.vk.com/method/users.get?access_token=${this.token}&user_ids=${user_ids}&fields=photo_50`) : false, messages]);
+								return Promise.all([
+									user_ids.length ? this.callApiMethod("users.get", { user_ids, fields: "photo_50" }) : false,
+									messages
+								]);
                             })
                             .then(([usersData, messages]) => {
                                 if (usersData) {
@@ -176,9 +229,10 @@ class VkService extends BaseService {
                                 return messages.reverse();
                             });
                     };
+					
                     dialog.sendMessage = (message) => {
-                        let urlId = (dialog.type == '1') ? `user_id=${dialog.user_id}` : `chat_id=${dialog.chat_id}`;
-                        this.$http.jsonp(`https://api.vk.com/method/messages.send?access_token=${this.token}&message=${message}&${urlId}`);
+						const idName = dialog.type == "1" ? "user_id" : "chat_id";
+						this.callApiMethod("messages.send", { message, [ idName ]: dialog[idName] });
                     };
                 });
 
