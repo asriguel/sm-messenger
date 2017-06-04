@@ -41,6 +41,7 @@ class VkService extends BaseService {
 			response.data.updates.forEach(update => {
 				if (update[0] == 4) {
 					if (update[2] != 35 && update[3] != this.$rootScope.vk.id) {
+						console.log(`user_ids at next poll will be: ${update[3]}`);
 						this.callApiMethod("users.get", { user_ids: update[3] })
 							.then(([ { first_name, last_name } ]) => {
 								console.log(`Poll update VK: first_name=${first_name}, last_name=${last_name}`);
