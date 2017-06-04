@@ -43,7 +43,7 @@ class VkService extends BaseService {
 				if (data.error) {
 					throw {
 						service: this.name,
-						message: `API method ${methodName} failed due to: ${data.error.err_msg}` 
+						message: `API method ${methodName} failed due to: ${data.error.error_msg}` 
 					};
 				}
 				return data;
