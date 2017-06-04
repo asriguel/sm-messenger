@@ -37,11 +37,13 @@ class VkService extends BaseService {
 	poll(ts, server, key) {
 		const requestString = this.makeRequestString({ act: "a_check", key, ts, wait: 25, mode: 2, version: 1 });
 		const url = `https://${server}?${requestString}`;
+		console.log(`VK Poll URL: ${url}`);
 		return this.$http.get(url).then(response => {
+			console.log(`VK poll succeeded`);
 			response.data.updates.forEach(update => {
 				if (update[0] == 4) {
 					if (update[2] != 35 && update[3] != this.$rootScope.vk.id) {
-						console.log(`user_ids at next poll will be: ${update[3]}`);
+						console.log(`VK: user_ids at next poll will be: ${update[3]}`);
 						this.callApiMethod("users.get", { user_ids: update[3] })
 							.then(([ { first_name, last_name } ]) => {
 								console.log(`Poll update VK: first_name=${first_name}, last_name=${last_name}`);
