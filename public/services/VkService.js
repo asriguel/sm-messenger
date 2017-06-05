@@ -230,7 +230,7 @@ class VkService extends BaseService {
 			service: "vk",
 			text: message.body,
 			unread: !message.read_state,
-			date: newDate(message.date * 1000),
+			date: new Date(message.date * 1000),
 			type: message.chat_id ? 2 : 1,
 			from_id: message.from_id,
 			user_id: message.chat_id ? undefined : message.user_id,
