@@ -18,6 +18,7 @@ app
 		}
 		return $rootScope.currentDialog.getMessages().then(messages => {
 			this.messages = messages;
+			console.log(`Reloaded current dialog: ${JSON.stringify(this.messages)}`);
 		}).catch(err => {
 			console.error(`Failed to reload current dialog`);
 			console.log(err);
@@ -54,6 +55,7 @@ app
 				dialogs.push(...list);
 				return dialogs;
 			}, []).sort((d1, d2) => compareDialogs(d1, d2));
+			console.log(`Reloaded dialog list: ${JSON.stringify(this.dialogs)}`);
 			if (!$rootScope.currentDialog && this.dialogs[0]) {
 				return this.setCurrentDialog(this.dialogs[0]);
 			}

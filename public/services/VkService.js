@@ -96,6 +96,7 @@ class VkService extends BaseService {
 	
 	processUpdates(updates) {
 		const updateDataArray = updates.map(update => this.processUpdate(update)).filter(data => data != null);
+		console.log(`Updates: ${JSON.stringify(updateDataArray)}`);
 		const user_ids = updateDataArray.map(({ peerId }) => peerId);
 		return this.callApiMethod("users.get", { user_ids: user_ids.join(",") }).then(
 			({ response: users }) => {
