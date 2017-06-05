@@ -99,8 +99,8 @@ class VkService extends BaseService {
 		const user_ids = updateDataArray.map(({ peerId }) => peerId);
 		return this.callApiMethod("users.get", { user_ids: user_ids.join(",") }).then(
 			({ response: users }) => {
-				users.forEach((user, i) => {
-					this.toaster.pop("success", `${user.first_name} ${user.last_name}`, updateDataArray[i].text);
+				users.forEach(user => {
+					this.toaster.pop("success", `${user.first_name} ${user.last_name}`, updateDataArray.find(data => data.peerId === user.uid).text);
 				});
 			}
 		);
@@ -166,7 +166,7 @@ class VkService extends BaseService {
 				const user_ids = response.map(item => item.from_id);
 				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map((user, i) => this.getMessage(response[i], user));
+						return users.map(user => this.getMessage(response.find(item => item.from_id === user.uid), user));
 					}
 				);
 			}
@@ -202,7 +202,7 @@ class VkService extends BaseService {
 				const user_ids = response.map(item => item.chat_id ? item.chat_id : item.user_id);
 				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map((user, i) => this.getDialog(response[i], user));
+						return users.map(user => this.getDialog(response.find(item => (item.chat_id ? item.chat_id : item.user_id) === user.uid), user));
 					}
 				);
 			}
