@@ -87,17 +87,23 @@ class VkService extends BaseService {
 					this.$rootScope.$emit("reloadCurrentDialog");
 				}
 			}
-			
-			return this.callApiMethod("users.get", { user_ids: peerId }).then(
-				({ response: [ { first_name, last_name } ] }) => {
-					this.toaster.pop("success", `${first_name} ${last_name}`, text);
-				}
-			);
+			return {
+				peerId,
+				text
+			};
 		}
 	}
 	
 	processUpdates(updates) {
-		return Promise.all(updates.map(update => this.processUpdate(update)));
+		const updateDataArray = updates.map(update => this.processUpdate(update));
+		const user_ids = updateDataArray.map(({ peerId }) => peerId);
+		return this.callApiMethod("users.get", { user_ids: user_ids.join(",") }).then(
+			({ response: users }) => {
+				users.forEach((user, i) => {
+					this.toaster.pop("success", `${user.first_name} ${user.last_name}`, updateDataArray[i].text);
+				});
+			}
+		);
 	}
 	
 	initPoller() {
