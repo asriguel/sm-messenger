@@ -22,7 +22,7 @@ class VkService extends BaseService {
 		this.pollEventCodes = {
 			NEW_MESSAGE: 4
 		};
-		this.pollTimeout = 1000;
+		this.pollTimeout = 5000;
 
         if ($cookies.get('vk_token')) {
             this.connect($cookies.get('vk_token'));
