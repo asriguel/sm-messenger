@@ -142,27 +142,27 @@ class VkService extends BaseService {
 		});
     }
 	
-	getMessage(item) {
-		const { from_id, date, body } = item;
-		const message = {
-			text: body,
-			date: new Date(date * 1000),
-			from_id
+	getMessage(item, user) {
+		return {
+			text: item.body,
+			date: new Date(item.date * 1000),
+			from_id: item.from_id,
+			full_name: `${user.first_name} ${user.last_name}`,
+			photo: user.photo_50
 		};
-		return this.callApiMethod("users.get", { user_ids: from_id, fields: "photo_50" }).then(
-			({ response: [ user ] }) => {
-				message.full_name = `${user.first_name} ${user.last_name}`;
-				message.photo = user.photo_50;
-				return message;
-			}
-		);
 	}
 	
 	getDialogMessages(dialog) {
 		return this.callApiMethod("messages.getHistory", { user_id: dialog.id }).then(
 			({ response }) => {
 				console.log(`Got dialog messages: ${response}`);
-				return Promise.all(response.items.map(item => this.getMessage(item)));
+				response.shift();
+				const user_ids = response.map(item => item.from_id);
+				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
+					({ response: users }) => {
+						return users.map((user, i) => this.getMessage(response[i], user));
+					}
+				);
 			}
 		);
 	}
@@ -171,36 +171,34 @@ class VkService extends BaseService {
 		const peerName = dialog.type === 1 ? "user_id" : "chat_id";
 		return this.callApiMethod("messages.send", { message, [ peerName ]: dialog[peerName] });
 	}
-
-	getDialog(item) {
-		const { body, read_state, date } = item;
+	
+	getDialog(item, user) {
 		const dialog = {
 			service: "vk",
-			text: body,
-			unread: !read_state,
-			date: new Date(date * 1000),
+			text: item.body,
+			unread: !item.read_state,
+			date: newDate(item.date * 1000),
 			type: item.chat_id ? 2 : 1,
-			id: item.chat_id ? item.chat_id : item.user_id
+			id: item.chat_id ? item.chat_id : item.user_id,
+			chat_title: item.chat_id ? item.title : undefined,
+			full_name: `${user.first_name} ${user.last_name}`,
+			photo: user.photo_50,
+			getMessages: () => this.getDialogMessages(dialog),
+			sendMessage: message => this.sendDialogMessage(dialog, message)
 		};
-		if (item.chat_id) {
-			dialog.chat_title = item.title;
-		}
-		return this.callApiMethod("users.get", { user_ids: dialog.id, fields: "photo_50" }).then(
-			({ response: [ user ] }) => {
-				dialog.full_name = `${user.first_name} ${user.last_name}`;
-				dialog.photo = user.photo_50;
-				dialog.getMessages = () => this.getDialogMessages(dialog);
-				dialog.sendMessage = (message) => this.sendDialogMessage(dialog, message);
-				return dialog;
-			}
-		);
+		return dialog;
 	}
 	
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
 			({ response }) => {
 				response.shift();
-				return Promise.all(response.map(item => this.getDialog(item)));
+				const user_ids = response.map(item => item.chat_id ? item.chat_id : item.user_id);
+				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
+					({ response: users }) => {
+						return users.map((user, i) => this.getDialog(response[i], user));
+					}
+				);
 			}
 		);
 	}
