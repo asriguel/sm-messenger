@@ -103,7 +103,7 @@ class VkService extends BaseService {
 							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
 							(!isChat && currentDialog.user_id === peerId)
 						) {
-							this.$rootDialog.$emit("reloadCurrentDialog");
+							this.$rootScope.$emit("reloadCurrentDialog");
 						}
 					}
 				}
