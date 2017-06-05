@@ -10,8 +10,15 @@ class VkService extends BaseService {
         this.$timeout = $timeout;
 		
 		this.apiURL = "https://api.vk.com/method";
+		this.apiVersion = "5.65";
+		
 		this.authURL = "https://oauth.vk.com/authorize";
-		this.authRedirectURI = "https://oauth.vk.com/blank.html&scope=messages&response_type=token";
+		this.authConfig = {
+			redirect_uri: "https://oauth.vk.com/blank.html",
+			scope: "messages",
+			response_type: "token",
+			display: "page"
+		};
 		
 		this.pollConfig = {
 			act: "a_check",
@@ -22,10 +29,17 @@ class VkService extends BaseService {
 		this.pollEventCodes = {
 			NEW_MESSAGE: 4
 		};
+		this.messageFlags = {
+			UNREAD: 1 << 0,
+			OUTBOX: 1 << 1,
+			CHAT: 1 << 4
+		};
+		this.chatOffset = 2000000000;
+		
 		this.pollTimeout = 5000;
 
-        if ($cookies.get('vk_token')) {
-            this.connect($cookies.get('vk_token'));
+        if ($cookies.get("vk_token")) {
+            this.connect($cookies.get("vk_token"));
         }
     }
 
@@ -36,7 +50,7 @@ class VkService extends BaseService {
 	callApiMethod(methodName, params) {
 		const url = super.buildRequestURL(
 			`${this.apiURL}/${methodName}`,
-			Object.assign({}, params, { access_token: this.token })
+			Object.assign({}, params, { access_token: this.token, v: this.apiVersion })
 		);
 		return this.$http.jsonp(url).then(
 			({ data }) => {
@@ -73,24 +87,33 @@ class VkService extends BaseService {
 		});
 	}
 	
-	//FIXME does not work with conversations
 	processUpdate([ eventCode, ...data ]) {
 		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
-			const [ flags, messageId, peerId, timestamp, text ] = data;
-
+			const [ flags, messageId, peerId, timestamp, text, extra ] = data;
+			const isChat = Boolean(flags & this.messageFlags.CHAT);
 			this.$rootScope.$emit("reloadDialogList");
 			const { currentDialog } = this.$rootScope;
 			if (currentDialog) {
-				const { service, peerId: currentPeerId } = currentDialog;
-				if (service === "vk" && (currentPeerId === peerId || peerId === this.$rootScope.vk.id)) {
-					this.$rootScope.$emit("reloadCurrentDialog");
+				const { service, type } = currentDialog;
+				if (service === "vk") {
+					const isCurrentChat = type === 2;
+					if (isChat === isCurrentChat) {
+						if (
+							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
+							(!isChat && currentDialog.user_id === peerId)
+						) {
+							this.$rootDialog.$emit("reloadCurrentDialog");
+						}
+					}
 				}
 			}
-			return {
-				peerId,
-				text
-			};
+			if (!(flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
+				return {
+					fromId: isChat ? extra.from : peerId,
+					text
+				};
+			}
 		}
 	}
 	
@@ -100,11 +123,18 @@ class VkService extends BaseService {
 		if (updateDataArray.length === 0) {
 			return Promise.resolve();
 		}
-		const user_ids = updateDataArray.map(({ peerId }) => peerId);
-		return this.callApiMethod("users.get", { user_ids: user_ids.join(",") }).then(
+		const userIds = updateDataArray.map(({ fromId }) => fromId);
+		const messages = updateDataArray.reduce((messages, data) => {
+			messages[data.fromId] = messages[data.fromId] || [];
+			messages[data.fromId].push(data.text);
+			return messages;
+		}, {});
+		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
-				users.forEach(user => {
-					this.toaster.pop("success", `${user.first_name} ${user.last_name}`, updateDataArray.find(data => data.peerId === user.uid).text);
+				users.forEach(({ id, first_name, last_name }) => {
+					const fullName = `${first_name} ${last_name}`;
+					const userMessages = messages[id];
+					userMessages.forEach(text => this.toaster.pop("success", fullName, text));
 				});
 			}
 		);
@@ -121,22 +151,22 @@ class VkService extends BaseService {
         this.connected = true;
 		return this.callApiMethod("users.get", { fields: "photo_50" }).then(({ response: [ user ] }) => {
 			this.$rootScope.vk = {
-				id: user.uid,
-				full_name: user.first_name + ' ' + user.last_name,
-				photo: user.photo
+				id: user.id
 			};
 			console.log(`Connect successful: ${JSON.stringify(this.$rootScope.vk)}`);
 			this.$rootScope.$emit("reloadDialogList");
 			return this.initPoller();
+		}).catch(err => {
+			this.$cookies.remove("vk_token");
+			throw err;
 		});
     }
 
     auth() {
-		const requestURL = super.buildRequestURL(this.authURL, {
-			client_id: this.clientId,
-			display: "page",
-			redirect_uri: this.authRedirectURI
-		});
+		const requestURL = super.buildRequestURL(
+			this.authURL,
+			Object.assign({}, this.authConfig, { client_id: this.clientId })
+		);
         this.$window.open(requestURL, '_blank');
         let authModal = this.$uibModal.open({
             templateUrl: 'assets/html/vkAuthModal.html',
@@ -147,30 +177,41 @@ class VkService extends BaseService {
         });
         return authModal.result.then(token => {
 			console.log(`Authorization VK successful: token=${token}`);
-			this.$cookies.put('vk_token', token);
+			this.$cookies.put("vk_token", token);
 			return this.connect(token);
 		});
     }
 	
-	getMessage(item, user) {
+	getMessage(message, user) {
 		return {
-			text: item.body,
-			date: new Date(item.date * 1000),
-			from_id: item.from_id,
+			text: message.body,
+			date: new Date(message.date * 1000),
+			from_id: message.from_id,
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50
 		};
 	}
 	
 	getDialogMessages(dialog) {
-		return this.callApiMethod("messages.getHistory", { user_id: dialog.id }).then(
-			({ response }) => {
-				console.log(`Got dialog messages: ${response}`);
-				response.shift();
-				const user_ids = response.map(item => item.from_id);
-				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
+		const peerId = dialog.type === 1 ? dialog.user_id : this.chatOffset + dialog.chat_id;
+		return this.callApiMethod("messages.getHistory", { peer_id: peerId }).then(
+			({ response: { items } }) => {
+				console.log(`Got dialog messages: ${items}`);
+				const userIds = items.map(item => item.from_id);
+				if (userIds.length === 0) {
+					return [];
+				}
+				const messages = items.reduce((messages, item) => {
+					messages[item.from_id] = messages[item.from_id] || [];
+					messages[item.from_id].push(item);
+					return messages;
+				}, {});
+				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map(user => this.getMessage(response.find(item => item.from_id === user.uid), user));
+						return users.map(user => {
+							const message = messages[user.id].shift();
+							return this.getMessage(message, user);
+						});
 					}
 				);
 			}
@@ -182,15 +223,17 @@ class VkService extends BaseService {
 		return this.callApiMethod("messages.send", { message, [ peerName ]: dialog[peerName] });
 	}
 	
-	getDialog(item, user) {
+	getDialog(message, user) {
 		const dialog = {
 			service: "vk",
-			text: item.body,
-			unread: !item.read_state,
-			date: newDate(item.date * 1000),
-			type: item.chat_id ? 2 : 1,
-			id: item.chat_id ? item.chat_id : item.user_id,
-			chat_title: item.chat_id ? item.title : undefined,
+			text: message.body,
+			unread: !message.read_state,
+			date: newDate(message.date * 1000),
+			type: message.chat_id ? 2 : 1,
+			from_id: message.from_id,
+			user_id: message.chat_id ? undefined : message.user_id,
+			chat_id: message.chat_id,
+			chat_title: message.chat_id ? message.title : undefined,
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50,
 			getMessages: () => this.getDialogMessages(dialog),
@@ -201,13 +244,23 @@ class VkService extends BaseService {
 	
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
-			({ response }) => {
-				console.log(`Got dialogs: ${JSON.stringify(response)}`);
-				response.shift();
-				const user_ids = response.map(item => item.chat_id ? item.chat_id : item.user_id);
-				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
+			({ response: { items } }) => {
+				console.log(`Got dialogs: ${JSON.stringify(items)}`);
+				const userIds = items.map(({ message }) => message.from_id);
+				if (userIds.length === 0) {
+					return [];
+				}
+				const messages = items.reduce((messages, { message }) => {
+					messages[message.from_id] = messages[message.from_id] || [];
+					messages[message.from_id].push(message);
+					return messages;
+				}, {});
+				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map(user => this.getDialog(response.find(item => (item.chat_id ? item.chat_id : item.user_id) === user.uid), user));
+						return users.map(user => {
+							const message = messages[user.id].shift();
+							return this.getDialog(message, user);
+						});
 					}
 				);
 			}
