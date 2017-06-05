@@ -58,7 +58,6 @@ class VkService extends BaseService {
 					`https://${server}`,
 					Object.assign({}, this.pollConfig, { ts, key })
 				);
-				console.log(`Polling URL: ${url}`);
 				return this.$http.get(url).then(
 					({ data }) => {
 						if (data.failed) {
@@ -67,7 +66,6 @@ class VkService extends BaseService {
 								message: `polling failed due to: ${data.failed}`
 							};
 						}
-						console.log(`Polled data: ${JSON.stringify(data)}`);
 						return this.processUpdates(data.updates).then(() => ts = data.ts);
 					}
 				);
@@ -78,6 +76,7 @@ class VkService extends BaseService {
 	//FIXME does not work with conversations
 	processUpdate([ eventCode, ...data ]) {
 		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
+			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ flags, messageId, peerId, timestamp, text ] = data;
 
 			this.$rootScope.$emit("reloadDialogList");
