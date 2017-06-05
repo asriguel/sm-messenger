@@ -183,13 +183,15 @@ class VkService extends BaseService {
     }
 	
 	getMessage(message, user) {
-		return {
+		const msg = {
 			text: message.body,
 			date: new Date(message.date * 1000),
 			from_id: message.from_id,
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50
 		};
+		console.log(`message: ${JSON.stringify(msg)}`);
+		return msg;
 	}
 	
 	getDialogMessages(dialog) {
@@ -239,6 +241,7 @@ class VkService extends BaseService {
 			getMessages: () => this.getDialogMessages(dialog),
 			sendMessage: message => this.sendDialogMessage(dialog, message)
 		};
+		console.log(`dialog: ${JSON.stringify(dialog)}`);
 		return dialog;
 	}
 	
