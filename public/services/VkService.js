@@ -249,6 +249,14 @@ class VkService extends BaseService {
 		return this.callApiMethod("messages.getDialogs").then(
 			({ response: { items } }) => {
 				console.log(`Got dialogs: ${JSON.stringify(items)}`);
+				items.forEach(({ message }) => {
+					if (message.chat_id) {
+						message.from_id = message.user_id;
+					}
+					else {
+						message.from_id = message.out ? this.$rootScope.vk.id : message.user_id;
+					}
+				});
 				const userIds = items.map(({ message }) => message.from_id);
 				if (userIds.length === 0) {
 					return [];
