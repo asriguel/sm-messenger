@@ -46,11 +46,18 @@ app
 	};
 	
 	const reloadServiceDialogs = service => {
-		return service.connected ? service.getDialogs() : Promise.resolve([]);
+		if (service.connected) {
+			return service.getDialogs();
+		}
+		else {
+			console.log(`Service ${service.name} disconnected`);
+			return Promise.resolve([]);
+		}
 	};
 	
 	this.reloadDialogList = () => {
 		return Promise.all(services.map(service => reloadServiceDialogs(service))).then(dialogLists => {
+			console.log(`Lists of dialogs: ${JSON.stringify(dialogLists)}`);
 			this.dialogs = dialogLists.reduce((dialogs, list) => {
 				dialogs.push(...list);
 				return dialogs;

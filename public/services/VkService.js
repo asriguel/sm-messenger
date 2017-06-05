@@ -202,6 +202,7 @@ class VkService extends BaseService {
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
 			({ response }) => {
+				console.log(`Got dialogs: ${JSON.stringify(response)}`);
 				response.shift();
 				const user_ids = response.map(item => item.chat_id ? item.chat_id : item.user_id);
 				return this.callApiMethod("users.get", { user_ids: user_ids.join(","), fields: "photo_50" }).then(
