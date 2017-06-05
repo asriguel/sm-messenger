@@ -116,6 +116,7 @@ class VkService extends BaseService {
 				photo: user.photo
 			};
 			console.log(`Connect successful: ${JSON.stringify(this.$rootScope.vk)}`);
+			this.$rootScope.$emit("reloadDialogList");
 			return this.initPoller();
 		});
     }
