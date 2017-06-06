@@ -96,9 +96,9 @@ class VkService extends BaseService {
 		});
 	}
 	
-	makePoller() {
+	initPoller() {
 		return this.callApiMethod("messages.getLongPollServer").then(({ response: { ts, key, server } }) => {
-			return () => {
+			const poller = () => {
 				const url = super.buildRequestURL(
 					`https://${server}`,
 					Object.assign({}, this.pollConfig, { ts, key })
@@ -112,11 +112,15 @@ class VkService extends BaseService {
 									message: `polling failed due to: ${data.failed}`
 								};
 							}
-							return this.processUpdates(data.updates).then(() => ts = data.ts);
+							return this.processUpdates(data.updates).then(() => {
+								ts = data.ts;
+								setTimeout(() => poller(), this.pollTimeout);
+							});
 						}
 					);
 				});
 			};
+			poller();
 		});
 	}
 	
@@ -173,14 +177,6 @@ class VkService extends BaseService {
 				}
 			}
 		);
-	}
-	
-	initPoller() {
-		return this.makePoller().then(poller => {
-			setInterval(() => {
-				poller();
-			}, this.pollTimeout);
-		});
 	}
 
     connect(token) {
