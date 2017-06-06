@@ -31,8 +31,7 @@ class VkService extends BaseService {
 		};
 		this.messageFlags = {
 			UNREAD: 1 << 0,
-			OUTBOX: 1 << 1,
-			CHAT: 1 << 4
+			OUTBOX: 1 << 1
 		};
 		this.chatOffset = 2000000000;
 		
@@ -94,7 +93,7 @@ class VkService extends BaseService {
 			console.log(`Flags: ${JSON.stringify(flags)}`);
 			console.log(`Peer: ${JSON.stringify(peerId)}`);
 			console.log(`Extra: ${JSON.stringify(extra)}`);
-			const isChat = Boolean(flags & this.messageFlags.CHAT);
+			const isChat = peerId > this.chatOffset;
 			this.$rootScope.$emit("reloadDialogList");
 			const { currentDialog } = this.$rootScope;
 			if (currentDialog) {
