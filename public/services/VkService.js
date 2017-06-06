@@ -101,6 +101,9 @@ class VkService extends BaseService {
 				const { service, type } = currentDialog;
 				if (service === "vk") {
 					const isCurrentChat = type === 2;
+					console.log(`Current chat: ${isCurrentChat}`);
+					console.log(`Current user_id: ${currentDialog.user_id}`);
+					console.log(`Current peer id: ${peerId}`);
 					if (isChat === isCurrentChat) {
 						if (
 							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
