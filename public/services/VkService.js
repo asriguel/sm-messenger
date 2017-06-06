@@ -165,6 +165,8 @@ class VkService extends BaseService {
 			({ response: users }) => {
 				console.log(`USERS: ${JSON.stringify(users)}`);
 				updateDataArray.forEach(data => {
+					console.log(`Moar data`);
+					console.log(`Moar data is: ${JSON.stringify(data)}`);
 					if (data.fromId) {
 						const { fromId, text } = data;
 						console.log(`DATA: ${JSON.stringify(data)}`);
