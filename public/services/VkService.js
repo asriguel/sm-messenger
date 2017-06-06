@@ -53,7 +53,7 @@ class VkService extends BaseService {
 			scheduledRequestTimestamp = ts + 1;
 		}
 		else {
-			const i = this.scheduledTimestamps.findIndex(ts => ts === 0);
+			let i = this.scheduledTimestamps.findIndex(ts => ts === 0);
 			if (i < 0) {
 				i = this.scheduledTimestamps.length;
 			}
