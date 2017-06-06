@@ -194,8 +194,9 @@ class VkService extends BaseService {
 	
 	getDialogMessages(dialog) {
 		const peerId = dialog.type === 1 ? dialog.user_id : this.chatOffset + dialog.chat_id;
-		return this.callApiMethod("messages.getHistory", { peer_id: peerId, rev: 1 }).then(
+		return this.callApiMethod("messages.getHistory", { peer_id: peerId }).then(
 			({ response: { items } }) => {
+				items = items.reverse();
 				console.log(`Got dialog messages: ${JSON.stringify(items)}`);
 				const userIds = items.map(item => item.from_id);
 				if (userIds.length === 0) {
