@@ -90,7 +90,7 @@ class VkService extends BaseService {
 	processUpdate([ eventCode, ...data ]) {
 		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
-			const [ flags, messageId, peerId, timestamp, text, extra ] = data;
+			const [ messageId, flags, peerId, timestamp, text, extra ] = data;
 			console.log(`Flags: ${JSON.stringify(flags)}`);
 			console.log(`Peer: ${JSON.stringify(peerId)}`);
 			console.log(`Extra: ${JSON.stringify(extra)}`);
