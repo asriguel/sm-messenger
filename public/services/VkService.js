@@ -43,25 +43,20 @@ class VkService extends BaseService {
     }
 
 	queue(apiRequestCallback) {
-		this.requestTimestamps = this.requestTimestamps || [ -1, -1, -1 ];
+		this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
 		const ts = Date.now();
-		let promise;
-		if (ts - this.requestTimestamps[0] > 1000) {
-			promise = new Promise(resolve => {
+		const needCooldown = this.scheduledTimestamps.every(ts => ts > 0) && ts - this.scheduledTimestamps[0] <= 1000;
+		const lastTimestamp = this.scheduledTimestamps[this.scheduledTimestamps.length - 1];
+		const scheduledRequestTimestamp = needCooldown
+		? lastTimestamp + (ts - this.scheduledTimestamps[0]) + 1
+		: Math.max(lastTimestamp, ts) + 1;
+		this.scheduledTimestamps.copyWithin(0, 1);
+		this.scheduledTimestamps[this.scheduledTimestamps.length - 1] = scheduledRequestTimestamp;
+		return new Promise(resolve => {
+			setTimeout(() => {
 				apiRequestCallback().then(resolve);
-			});
-		}
-		else {
-			console.log(`Delaying...`);
-			promise = new Promise(resolve => {
-				setTimeout(() => {
-					apiRequestCallback().then(resolve);
-				}, 1000/* - (ts - this.requestTimestamps[0])*/);
-			});
-		}
-		this.requestTimestamps.copyWithin(0, 1);
-		this.requestTimestamps[this.requestTimestamps.length - 1] = ts;
-		return promise;
+			}, scheduledRequestTimestamp - ts);
+		});
 	}
 
     setClientId(clientId) {
