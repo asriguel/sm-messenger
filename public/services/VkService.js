@@ -36,6 +36,8 @@ class VkService extends BaseService {
 		this.chatOffset = 2000000000;
 		
 		this.pollTimeout = 1000;
+		
+		this.queueCooldown = 350;
 
         if ($cookies.get("vk_token")) {
             this.connect($cookies.get("vk_token"));
@@ -43,7 +45,17 @@ class VkService extends BaseService {
     }
 
 	queue(apiRequestCallback) {
-		this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
+		const ts = Date.now();
+		this.lastTimestamp = this.lastTimestamp || ts;
+		const promise = new Promise(resolve => {
+			setTimeout(() => {
+				apiRequestCallback().then(resolve);
+			}, ts > this.lastTimestamp ? this.queueCooldown : (this.lastTimestamp - ts) + this.queueCooldown);
+		});
+		this.lastTimestamp += this.queueCooldown;
+		return promise;
+		
+		/*this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
 		const ts = Date.now();
 		const needCooldown = this.scheduledTimestamps.every(ts => ts > 0) && ts - this.scheduledTimestamps[0] <= 1000;
 		const lastTimestamp = this.scheduledTimestamps[this.scheduledTimestamps.length - 1];
@@ -56,7 +68,7 @@ class VkService extends BaseService {
 			setTimeout(() => {
 				apiRequestCallback().then(resolve);
 			}, scheduledRequestTimestamp - ts);
-		});
+		});*/
 	}
 
     setClientId(clientId) {
