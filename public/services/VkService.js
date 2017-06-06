@@ -37,7 +37,7 @@ class VkService extends BaseService {
 		
 		this.pollTimeout = 1000;
 		
-		this.queueCooldown = 400;
+		//this.queueCooldown = 400;
 
         if ($cookies.get("vk_token")) {
             this.connect($cookies.get("vk_token"));
@@ -45,7 +45,7 @@ class VkService extends BaseService {
     }
 
 	queue(apiRequestCallback) {
-		const ts = Date.now();
+		/*const ts = Date.now();
 		this.lastTimestamp = this.lastTimestamp || ts;
 		const promise = new Promise(resolve => {
 			setTimeout(() => {
@@ -53,9 +53,9 @@ class VkService extends BaseService {
 			}, ts > this.lastTimestamp ? this.queueCooldown : (this.lastTimestamp - ts) + this.queueCooldown);
 		});
 		this.lastTimestamp = ts > this.lastTimestamp ? ts + this.queueCooldown : this.lastTimestamp + this.queueCooldown;
-		return promise;
+		return promise;*/
 		
-		/*this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
+		this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
 		const ts = Date.now();
 		const needCooldown = this.scheduledTimestamps.every(ts => ts > 0) && ts - this.scheduledTimestamps[0] <= 1000;
 		const lastTimestamp = this.scheduledTimestamps[this.scheduledTimestamps.length - 1];
@@ -68,7 +68,7 @@ class VkService extends BaseService {
 			setTimeout(() => {
 				apiRequestCallback().then(resolve);
 			}, scheduledRequestTimestamp - ts);
-		});*/
+		});
 	}
 
     setClientId(clientId) {
