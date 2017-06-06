@@ -81,6 +81,11 @@
                 <p ng-bind-html="message.text">
 
                 </p>
+                <ul class="attachments-wrapper" ng-if="message.images.length">
+                    <li ng-repeat="img in message.images">
+                        <img  src="{{img}}" alt="">
+                    </li>
+                </ul>
             </div>
         </li>
     </ul>
