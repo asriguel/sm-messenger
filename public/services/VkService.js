@@ -163,16 +163,9 @@ class VkService extends BaseService {
 		const userIds = updateDataArray.filter(data => data.fromId).map(({ fromId }) => fromId);
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
-				console.log(`USERS: ${JSON.stringify(users)}`);
 				updateDataArray.forEach(data => {
-					console.log(`Moar data`);
-					console.log(`Moar data is: ${JSON.stringify(data)}`);
 					if (data.fromId) {
 						const { fromId, text } = data;
-						console.log(`DATA: ${JSON.stringify(data)}`);
-						console.log(`FIND: ${JSON.stringify(users.find(user => user.id == fromId))}`);
-						console.log(`FROM ID: ${fromId}`);
-						console.log(`TYPE: ${typeof fromId}`);
 						const { first_name, last_name } = users.find(user => user.id == fromId);
 						const fullName = `${first_name} ${last_name}`;
 						this.toaster.pop("success", fullName, text);
