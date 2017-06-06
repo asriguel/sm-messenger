@@ -91,6 +91,9 @@ class VkService extends BaseService {
 		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ flags, messageId, peerId, timestamp, text, extra ] = data;
+			console.log(`Flags: ${JSON.stringify(flags)}`);
+			console.log(`Peer: ${JSON.stringify(peerId)}`);
+			console.log(`Extra: ${JSON.stringify(extra)}`);
 			const isChat = Boolean(flags & this.messageFlags.CHAT);
 			this.$rootScope.$emit("reloadDialogList");
 			const { currentDialog } = this.$rootScope;
