@@ -84,6 +84,7 @@ app
 			return Promise.resolve();
 		}
         else {
+			$scope.message = "";
 			return $rootScope.currentDialog.sendMessage($scope.message);
 		}
     };
