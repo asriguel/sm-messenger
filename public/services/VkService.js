@@ -149,13 +149,16 @@ class VkService extends BaseService {
 			return Promise.resolve();
 		}
 		console.log(`Updates: ${JSON.stringify(updateDataArray)}`);
-		const userIds = updateDataArray.map(({ fromId }) => fromId);
+		const userIds = updateDataArray.filter(data => data.fromId).map(({ fromId }) => fromId);
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
-				updateDataArray.forEach(({ fromId, text }) => {
-					const { first_name, last_name } = users.find(user => user.id === fromId);
-					const fullName = `${first_name} ${last_name}`;
-					this.toaster.pop("success", fullName, text);
+				updateDataArray.forEach(data => {
+					if (data.fromId) {
+						const { fromId, text } = data;
+						const { first_name, last_name } = users.find(user => user.id === fromId);
+						const fullName = `${first_name} ${last_name}`;
+						this.toaster.pop("success", fullName, text);
+					}
 				});
 				this.$rootScope.$emit("reloadDialogList");
 				if (updateDataArray.some(({ currentDialogInvalidated }) => currentDialogInvalidated)) {
