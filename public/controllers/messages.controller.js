@@ -8,7 +8,7 @@ app
 	// init mailruService
     mailruService.setClientId(754302);
 
-    let services = [ vkService, /*mailruService*/ ];
+    let services = [ vkService, mailruService ];
 	
 	this.reloadCurrentDialog = () => {
 		if (!$rootScope.currentDialog) {

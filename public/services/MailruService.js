@@ -64,7 +64,7 @@ class MailruService extends BaseService {
 				console.error(`Failed to initialize mail.ru user: ${JSON.stringify(response.data.error)}`);
 				this.$cookies.remove('mailru_token');
 				this.$cookies.remove("mailru_uid");
-				throw { service: this.name, message: response.data.error.error_msg };
+				throw { service: this.name, message: response.data.error.error_msg, showPopup: true };
 			}
 			const user = response.data[0];
 			console.log(`mail.ru user: ${JSON.stringify(user)}`);
@@ -84,10 +84,10 @@ class MailruService extends BaseService {
 		console.log(`Polling...`);
 		if (this.$rootScope.currentDialog && this.$rootScope.currentDialog.service === "mailru") {
 			console.log(`Current dialog belongs to mail.ru`);
-			this.$rootScope.$emit("rerenderMessages");
+			this.$rootScope.$emit("reloadCurrentDialog");
 			this.$rootScope.$emit("scrollBottom");
 		}
-		this.$rootScope.$emit("updateDialogs");
+		this.$rootScope.$emit("reloadDialogList");
 	}
 	
 	setupPoller() {
@@ -101,7 +101,7 @@ class MailruService extends BaseService {
         this.connected = true;
 		
 		console.log(`Connecting to mail.ru...`);
-		return this.initUser().then(() => this.setupPoller()).then(() => this.$rootScope.$emit("updateDialogs"));
+		return this.initUser().then(() => this.setupPoller()).then(() => this.$rootScope.$emit("reloadDialogList"));
 	}
 	
 	auth() {
