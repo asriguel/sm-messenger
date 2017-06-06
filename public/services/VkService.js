@@ -124,17 +124,12 @@ class VkService extends BaseService {
 			return Promise.resolve();
 		}
 		const userIds = updateDataArray.map(({ fromId }) => fromId);
-		const messages = updateDataArray.reduce((messages, data) => {
-			messages[data.fromId] = messages[data.fromId] || [];
-			messages[data.fromId].push(data.text);
-			return messages;
-		}, {});
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
-				users.forEach(({ id, first_name, last_name }) => {
+				updateDataArray.forEach(({ fromId, text }) => {
+					const { first_name, last_name } = users.find(user => user.id === fromId);
 					const fullName = `${first_name} ${last_name}`;
-					const userMessages = messages[id];
-					userMessages.forEach(text => this.toaster.pop("success", fullName, text));
+					this.toaster.pop("success", fullName, text);
 				});
 			}
 		);
@@ -203,16 +198,11 @@ class VkService extends BaseService {
 				if (userIds.length === 0) {
 					return [];
 				}
-				const messages = items.reduce((messages, item) => {
-					messages[item.from_id] = messages[item.from_id] || [];
-					messages[item.from_id].push(item);
-					return messages;
-				}, {});
 				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map(user => {
-							const message = messages[user.id].shift();
-							return this.getMessage(message, user);
+						return items.map(item => {
+							const user = users.find(user => user.id === item.from_id);
+							return this.getMessage(item, user);
 						});
 					}
 				);
@@ -261,15 +251,10 @@ class VkService extends BaseService {
 				if (userIds.length === 0) {
 					return [];
 				}
-				const messages = items.reduce((messages, { message }) => {
-					messages[message.from_id] = messages[message.from_id] || [];
-					messages[message.from_id].push(message);
-					return messages;
-				}, {});
 				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
-						return users.map(user => {
-							const message = messages[user.id].shift();
+						return items.map(({ message }) => {
+							const user = users.find(user => user.id === message.from_id);
 							return this.getDialog(message, user);
 						});
 					}
