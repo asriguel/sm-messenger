@@ -142,7 +142,7 @@ class VkService extends BaseService {
 	initPoller() {
 		return this.makePoller().then(poller => {
 			setInterval(() => {
-				poller().then(() => this.$scope.apply());
+				poller();
 			}, this.pollTimeout);
 		});
 	}
