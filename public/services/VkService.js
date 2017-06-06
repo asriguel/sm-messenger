@@ -92,8 +92,8 @@ class VkService extends BaseService {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ messageId, flags, peerId, timestamp, text, extra ] = data;
 			const isChat = peerId > this.chatOffset;
-			this.$rootScope.$emit("reloadDialogList");
 			const { currentDialog } = this.$rootScope;
+			let currentDialogInvalidated = false;
 			if (currentDialog) {
 				const { service, type } = currentDialog;
 				if (service === "vk") {
@@ -103,18 +103,17 @@ class VkService extends BaseService {
 							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
 							(!isChat && currentDialog.user_id === peerId)
 						) {
-							console.log(`Reloading current dialog...`);
-							this.$rootScope.$emit("reloadCurrentDialog");
+							currentDialogInvalidated = true;
 						}
 					}
 				}
 			}
+			const updateData = { currentDialogInvalidated };
 			if (!(flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
-				return {
-					fromId: isChat ? extra.from : peerId,
-					text
-				};
+				const fromId = isChat ? extra.from : peerId;
+				Object.assign(updateData, { fromId, text });
 			}
+			return updateData;
 		}
 	}
 	
@@ -132,6 +131,10 @@ class VkService extends BaseService {
 					const fullName = `${first_name} ${last_name}`;
 					this.toaster.pop("success", fullName, text);
 				});
+				this.$rootScope.$emit("reloadDialogList");
+				if (updateDataArray.some(({ currentDialogInvalidated }) => currentDialogInvalidated)) {
+					this.$rootScope.$emit("reloadCurrentDialog");
+				}
 			}
 		);
 	}
