@@ -52,10 +52,11 @@ class VkService extends BaseService {
 			});
 		}
 		else {
+			console.log(`Delaying...`);
 			promise = new Promise(resolve => {
 				setTimeout(() => {
 					apiRequestCallback().then(resolve);
-				}, 1000 - (ts - this.requestTimestamps[0]));
+				}, 1000/* - (ts - this.requestTimestamps[0])*/);
 			});
 		}
 		this.requestTimestamps.copyWithin(0, 1);
