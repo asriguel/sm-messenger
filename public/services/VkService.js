@@ -45,16 +45,6 @@ class VkService extends BaseService {
     }
 
 	queue(apiRequestCallback) {
-		/*const ts = Date.now();
-		this.lastTimestamp = this.lastTimestamp || ts;
-		const promise = new Promise(resolve => {
-			setTimeout(() => {
-				apiRequestCallback().then(resolve);
-			}, ts > this.lastTimestamp ? this.queueCooldown : (this.lastTimestamp - ts) + this.queueCooldown);
-		});
-		this.lastTimestamp = ts > this.lastTimestamp ? ts + this.queueCooldown : this.lastTimestamp + this.queueCooldown;
-		return promise;*/
-		
 		this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
 		const ts = Date.now();
 		const needCooldown = this.scheduledTimestamps.every(ts => ts > 0) && ts - this.scheduledTimestamps[0] <= 1000;
