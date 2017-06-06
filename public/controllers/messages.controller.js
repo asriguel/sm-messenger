@@ -18,7 +18,6 @@ app
 		}
 		return $rootScope.currentDialog.getMessages().then(messages => {
 			this.messages = messages;
-			console.log(`Reloaded current dialog: ${JSON.stringify(this.messages)}`);
 		}).catch(err => {
 			console.error(`Failed to reload current dialog`);
 			console.log(err);
@@ -57,7 +56,6 @@ app
 	
 	this.reloadDialogList = () => {
 		return Promise.all(services.map(service => reloadServiceDialogs(service))).then(dialogLists => {
-			console.log(`Lists of dialogs: ${JSON.stringify(dialogLists)}`);
 			this.dialogs = dialogLists.reduce((dialogs, list) => {
 				dialogs.push(...list);
 				return dialogs;

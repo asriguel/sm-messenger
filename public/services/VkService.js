@@ -109,12 +109,13 @@ class VkService extends BaseService {
 							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
 							(!isChat && currentDialog.user_id === peerId)
 						) {
+							console.log(`Reloading current dialog...`);
 							this.$rootScope.$emit("reloadCurrentDialog");
 						}
 					}
 				}
 			}
-			if ((flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
+			if (!(flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
 				return {
 					fromId: isChat ? extra.from : peerId,
 					text
@@ -200,7 +201,6 @@ class VkService extends BaseService {
 		return this.callApiMethod("messages.getHistory", { peer_id: peerId }).then(
 			({ response: { items } }) => {
 				items = items.reverse();
-				console.log(`Got dialog messages: ${JSON.stringify(items)}`);
 				const userIds = items.map(item => item.from_id);
 				if (userIds.length === 0) {
 					return [];
@@ -245,7 +245,6 @@ class VkService extends BaseService {
 	getDialogs() {
 		return this.callApiMethod("messages.getDialogs").then(
 			({ response: { items } }) => {
-				console.log(`Got dialogs: ${JSON.stringify(items)}`);
 				items.forEach(({ message }) => {
 					if (message.chat_id) {
 						message.from_id = message.user_id;
