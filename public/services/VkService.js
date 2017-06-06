@@ -163,6 +163,7 @@ class VkService extends BaseService {
 		const userIds = updateDataArray.filter(data => data.fromId).map(({ fromId }) => fromId);
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
+				console.log(`USERS: ${JSON.stringify(users)}`);
 				updateDataArray.forEach(data => {
 					if (data.fromId) {
 						const { fromId, text } = data;
