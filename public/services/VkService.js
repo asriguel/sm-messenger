@@ -111,7 +111,7 @@ class VkService extends BaseService {
 					}
 				}
 			}
-			if (!(flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
+			if ((flags & this.messageFlags.OUTBOX) && (flags & this.messageFlags.UNREAD)) {
 				return {
 					fromId: isChat ? extra.from : peerId,
 					text
