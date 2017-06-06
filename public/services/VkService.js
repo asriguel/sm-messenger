@@ -35,7 +35,7 @@ class VkService extends BaseService {
 		};
 		this.chatOffset = 2000000000;
 		
-		this.pollTimeout = 5000;
+		this.pollTimeout = 1000;
 
         if ($cookies.get("vk_token")) {
             this.connect($cookies.get("vk_token"));
