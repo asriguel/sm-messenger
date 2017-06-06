@@ -167,6 +167,10 @@ class VkService extends BaseService {
 				updateDataArray.forEach(data => {
 					if (data.fromId) {
 						const { fromId, text } = data;
+						console.log(`DATA: ${JSON.stringify(data)}`);
+						console.log(`FIND: ${JSON.stringify(users.find(user => user.id == fromId))}`);
+						console.log(`FROM ID: ${fromId}`);
+						console.log(`TYPE: ${typeof fromId}`);
 						const { first_name, last_name } = users.find(user => user.id == fromId);
 						const fullName = `${first_name} ${last_name}`;
 						this.toaster.pop("success", fullName, text);
