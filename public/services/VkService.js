@@ -45,9 +45,8 @@ class VkService extends BaseService {
 	queue(apiRequestCallback) {
 		this.requestTimestamps = this.requestTimestamps || [ -1, -1, -1 ];
 		const ts = Date.now();
-		const cooldown = ts - this.requestTimestamps[0];
 		let promise;
-		if (cooldown > 1000) {
+		if (ts - this.requestTimestamps[0] > 1000) {
 			promise = new Promise(resolve => {
 				apiRequestCallback().then(resolve);
 			});
@@ -56,7 +55,7 @@ class VkService extends BaseService {
 			promise = new Promise(resolve => {
 				setTimeout(() => {
 					apiRequestCallback().then(resolve);
-				}, cooldown);
+				}, 1000 - (ts - this.requestTimestamps[0]));
 			});
 		}
 		this.requestTimestamps.copyWithin(0, 1);
