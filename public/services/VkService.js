@@ -37,7 +37,7 @@ class VkService extends BaseService {
 		
 		this.pollTimeout = 1000;
 		
-		this.queueCooldown = 350;
+		this.queueCooldown = 400;
 
         if ($cookies.get("vk_token")) {
             this.connect($cookies.get("vk_token"));
