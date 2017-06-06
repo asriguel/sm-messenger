@@ -125,7 +125,7 @@ class VkService extends BaseService {
 	}
 	
 	processUpdate([ eventCode, ...data ]) {
-		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
+		if (eventCode == this.pollEventCodes.NEW_MESSAGE) {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ messageId, flags, peerId, timestamp, text, extra ] = data;
 			const isChat = peerId > this.chatOffset;
@@ -137,8 +137,8 @@ class VkService extends BaseService {
 					const isCurrentChat = type === 2;
 					if (isChat === isCurrentChat) {
 						if (
-							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
-							(!isChat && currentDialog.user_id === peerId)
+							(isChat && currentDialog.chat_id + this.chatOffset == peerId) ||
+							(!isChat && currentDialog.user_id == peerId)
 						) {
 							currentDialogInvalidated = true;
 						}
@@ -167,7 +167,7 @@ class VkService extends BaseService {
 				updateDataArray.forEach(data => {
 					if (data.fromId) {
 						const { fromId, text } = data;
-						const { first_name, last_name } = users.find(user => user.id === fromId);
+						const { first_name, last_name } = users.find(user => user.id == fromId);
 						const fullName = `${first_name} ${last_name}`;
 						this.toaster.pop("success", fullName, text);
 					}
@@ -239,7 +239,7 @@ class VkService extends BaseService {
 				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
 						return items.map(item => {
-							const user = users.find(user => user.id === item.from_id);
+							const user = users.find(user => user.id == item.from_id);
 							return this.getMessage(item, user);
 						});
 					}
@@ -290,7 +290,7 @@ class VkService extends BaseService {
 				return this.callApiMethod("users.get", { user_ids: userIds.join(","), fields: "photo_50" }).then(
 					({ response: users }) => {
 						return items.map(({ message }) => {
-							const user = users.find(user => user.id === message.from_id);
+							const user = users.find(user => user.id == message.from_id);
 							return this.getDialog(message, user);
 						});
 					}
