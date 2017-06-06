@@ -42,6 +42,28 @@ class VkService extends BaseService {
         }
     }
 
+	queue(apiRequestCallback) {
+		this.requestTimestamps = this.requestTimestamps || [ -1, -1, -1 ];
+		const ts = Date.now();
+		const cooldown = ts - this.requestTimestamps[0];
+		let promise;
+		if (cooldown > 1000) {
+			promise = new Promise(resolve => {
+				apiRequestCallback().then(resolve);
+			});
+		}
+		else {
+			promise = new Promise(resolve => {
+				setTimeout(() => {
+					apiRequestCallback().then(resolve);
+				}, cooldown);
+			});
+		}
+		this.requestTimestamps.copyWithin(0, 1);
+		this.requestTimestamps[this.requestTimestamps.length - 1] = ts;
+		return promise;
+	}
+
     setClientId(clientId) {
         this.clientId = clientId;
     }
@@ -51,18 +73,20 @@ class VkService extends BaseService {
 			`${this.apiURL}/${methodName}`,
 			Object.assign({}, params, { access_token: this.token, v: this.apiVersion })
 		);
-		return this.$http.jsonp(url).then(
-			({ data }) => {
-				if (data.error) {
-					throw {
-						service: this.name,
-						message: `API method ${methodName} failed due to: ${data.error.error_msg}`,
-						showPopup: data.error.error_code !== 6
-					};
+		return this.queue(() => {
+			return this.$http.jsonp(url).then(
+				({ data }) => {
+					if (data.error) {
+						throw {
+							service: this.name,
+							message: `API method ${methodName} failed due to: ${data.error.error_msg}`,
+							showPopup: data.error.error_code !== 6
+						};
+					}
+					return data;
 				}
-				return data;
-			}
-		);
+			);
+		});
 	}
 	
 	makePoller() {
@@ -72,17 +96,19 @@ class VkService extends BaseService {
 					`https://${server}`,
 					Object.assign({}, this.pollConfig, { ts, key })
 				);
-				return this.$http.get(url).then(
-					({ data }) => {
-						if (data.failed) {
-							throw {
-								service: this.name,
-								message: `polling failed due to: ${data.failed}`
-							};
+				return this.queue(() => {
+					return this.$http.get(url).then(
+						({ data }) => {
+							if (data.failed) {
+								throw {
+									service: this.name,
+									message: `polling failed due to: ${data.failed}`
+								};
+							}
+							return this.processUpdates(data.updates).then(() => ts = data.ts);
 						}
-						return this.processUpdates(data.updates).then(() => ts = data.ts);
-					}
-				);
+					);
+				});
 			};
 		});
 	}
