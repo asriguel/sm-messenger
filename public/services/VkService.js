@@ -90,9 +90,6 @@ class VkService extends BaseService {
 		if (eventCode === this.pollEventCodes.NEW_MESSAGE) {
 			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ messageId, flags, peerId, timestamp, text, extra ] = data;
-			console.log(`Flags: ${JSON.stringify(flags)}`);
-			console.log(`Peer: ${JSON.stringify(peerId)}`);
-			console.log(`Extra: ${JSON.stringify(extra)}`);
 			const isChat = peerId > this.chatOffset;
 			this.$rootScope.$emit("reloadDialogList");
 			const { currentDialog } = this.$rootScope;
@@ -100,9 +97,6 @@ class VkService extends BaseService {
 				const { service, type } = currentDialog;
 				if (service === "vk") {
 					const isCurrentChat = type === 2;
-					console.log(`Current chat: ${isCurrentChat}`);
-					console.log(`Current user_id: ${currentDialog.user_id}`);
-					console.log(`Current peer id: ${peerId}`);
 					if (isChat === isCurrentChat) {
 						if (
 							(isChat && currentDialog.chat_id + this.chatOffset === peerId) ||
@@ -125,10 +119,10 @@ class VkService extends BaseService {
 	
 	processUpdates(updates) {
 		const updateDataArray = updates.map(update => this.processUpdate(update)).filter(data => data != null);
-		console.log(`Updates: ${JSON.stringify(updateDataArray)}`);
 		if (updateDataArray.length === 0) {
 			return Promise.resolve();
 		}
+		console.log(`Updates: ${JSON.stringify(updateDataArray)}`);
 		const userIds = updateDataArray.map(({ fromId }) => fromId);
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {

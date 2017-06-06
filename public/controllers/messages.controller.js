@@ -19,9 +19,6 @@ app
 		return $rootScope.currentDialog.getMessages().then(messages => {
 			this.messages = messages;
 		}).catch(err => {
-			console.error(`Failed to reload current dialog`);
-			console.log(err);
-			console.log(`current dialog: ${JSON.stringify($rootScope.currentDialog)}`);
 			toaster.pop("error", err.service, err.message);
 		});
 	};
@@ -67,9 +64,6 @@ app
 				return Promise.resolve();
 			}
 		}).catch(err => {
-			console.error(`Failed to reload dialog list`);
-			console.log(err);
-			console.log(`Current dialog: ${$rootScope.currentDialog}`);
 			toaster.pop("error", err.service, err.message);
 		});
 	};
