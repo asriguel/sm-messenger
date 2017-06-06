@@ -46,14 +46,34 @@ class VkService extends BaseService {
 
 	queue(apiRequestCallback) {
 		this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
+		const firstTimestamp = this.scheduledTimestamps[0];
 		const ts = Date.now();
-		const needCooldown = this.scheduledTimestamps.every(ts => ts > 0) && ts - this.scheduledTimestamps[0] <= 1000;
-		const lastTimestamp = this.scheduledTimestamps[this.scheduledTimestamps.length - 1];
-		const scheduledRequestTimestamp = needCooldown
-		? lastTimestamp + (ts - this.scheduledTimestamps[0]) + 1
-		: Math.max(lastTimestamp, ts) + 1;
-		this.scheduledTimestamps.copyWithin(0, 1);
-		this.scheduledTimestamps[this.scheduledTimestamps.length - 1] = scheduledRequestTimestamp;
+		let scheduledRequestTimestamp;
+		if (firstTimestamp === 0) {
+			scheduledRequestTimestamp = ts + 1;
+		}
+		else {
+			const i = this.scheduledTimestamps.findIndex(ts => ts === 0);
+			if (i < 0) {
+				i = this.scheduledTimestamps.length;
+			}
+			const lastTimestamp = this.scheduledTimestamps[i];
+			const threshold = Math.max(firstTimestamp + 1000, lastTimestamp);
+			if (ts < threshold) {
+				scheduledRequestTimestamp = threshold + 1;
+			}
+			else {
+				scheduledRequestTimestamp = ts + 1;
+			}
+		}
+		const i = this.scheduledTimestamps.findIndex(ts => ts === 0);
+		if (i >= 0) {
+			this.scheduledTimestamps[i] = scheduledRequestTimestamp;
+		}
+		else {
+			this.scheduledTimestamps.copyWithin(0, 1);
+			this.scheduledTimestamps[this.scheduledTimestamps.length - 1] = scheduledRequestTimestamp;
+		}
 		return new Promise(resolve => {
 			setTimeout(() => {
 				apiRequestCallback().then(resolve);
