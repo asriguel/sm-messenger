@@ -60,7 +60,6 @@ app
 				dialogs.push(...list);
 				return dialogs;
 			}, []).sort((d1, d2) => compareDialogs(d1, d2));
-			console.log(`Reloaded dialog list: ${JSON.stringify(this.dialogs)}`);
 			if (!$rootScope.currentDialog && this.dialogs[0]) {
 				return this.setCurrentDialog(this.dialogs[0]);
 			}

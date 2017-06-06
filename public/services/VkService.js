@@ -192,7 +192,6 @@ class VkService extends BaseService {
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50
 		};
-		console.log(`message: ${JSON.stringify(msg)}`);
 		return msg;
 	}
 	
@@ -238,7 +237,6 @@ class VkService extends BaseService {
 			getMessages: () => this.getDialogMessages(dialog),
 			sendMessage: message => this.sendDialogMessage(dialog, message)
 		};
-		console.log(`dialog: ${JSON.stringify(dialog)}`);
 		return dialog;
 	}
 	
