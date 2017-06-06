@@ -56,7 +56,8 @@ class VkService extends BaseService {
 				if (data.error) {
 					throw {
 						service: this.name,
-						message: `API method ${methodName} failed due to: ${data.error.error_msg}` 
+						message: `API method ${methodName} failed due to: ${data.error.error_msg}`,
+						showPopup: data.error.error_code !== 6
 					};
 				}
 				return data;

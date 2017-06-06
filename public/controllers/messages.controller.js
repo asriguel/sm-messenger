@@ -19,7 +19,9 @@ app
 		return $rootScope.currentDialog.getMessages().then(messages => {
 			this.messages = messages;
 		}).catch(err => {
-			toaster.pop("error", err.service, err.message);
+			if (err.showPopup) {
+				toaster.pop("error", err.service, err.message);
+			}
 		});
 	};
 	
@@ -64,7 +66,9 @@ app
 				return Promise.resolve();
 			}
 		}).catch(err => {
-			toaster.pop("error", err.service, err.message);
+			if (err.showPopup) {
+				toaster.pop("error", err.service, err.message);
+			}
 		});
 	};
 
