@@ -52,7 +52,7 @@ class VkService extends BaseService {
 				apiRequestCallback().then(resolve);
 			}, ts > this.lastTimestamp ? this.queueCooldown : (this.lastTimestamp - ts) + this.queueCooldown);
 		});
-		this.lastTimestamp += this.queueCooldown;
+		this.lastTimestamp = ts > this.lastTimestamp ? ts + this.queueCooldown : this.lastTimestamp + this.queueCooldown;
 		return promise;
 		
 		/*this.scheduledTimestamps = this.scheduledTimestamps || [ 0, 0, 0 ];
