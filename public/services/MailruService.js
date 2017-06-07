@@ -140,7 +140,7 @@ class MailruService extends BaseService {
 	}
 	
 	getMessage({ message, time, type }, { full_name, photo }) {
-		const isMy = type === 0;
+		const isMy = type == 0;
 		return {
 			text: message.map(({ content }) => content).join(""),
 			date: new Date(time * 1000),
@@ -160,16 +160,21 @@ class MailruService extends BaseService {
 		return this.callApiMethod("messages.post", { uid: user_id, message });
 	}
 	
-	getDialog(thread, lastMessage) {
+	getDialog(thread, lastMessage, lastUser) {
 		const dialog = {
 			service: "mailru",
 			text: lastMessage.message.map(part => String(part.content)).join(""),
 			unread: Boolean(thread.unread),
 			date: new Date(thread.time * 1000),
 			user_id: thread.user.uid,
-			full_name: `${thread.user.first_name} ${thread.user.last_name}`,
-			photo: thread.user.pic,
+			full_name: `${lastUser.first_name} ${lastUser.last_name}`,
+			photo: lastUser.pic,
+			my: lastMessage.author_id == this.$rootScope.mailru.id,
 			type: 1,
+			peer: {
+				full_name: `${thread.user.first_name} ${thread.user.last_name}`,
+				photo: thread.user.pic
+			},
 			getMessages: () => this.getDialogMessages(dialog),
 			sendMessage: message => this.sendDialogMessage(dialog, message)
 		};
@@ -184,7 +189,18 @@ class MailruService extends BaseService {
 						([ message ]) => message
 					);
 				})).then(messages => {
-					return data.map((thread, i) => this.getDialog(thread, messages[i]));
+					const userIds = messages.map(({ author_id }) => author_id);
+					if (userIds.length === 0) {
+						return Promise.resolve([]);
+					}
+					return this.callApiMethod("users.getInfo", { uids: userIds.join(",") }).then(
+						users => {
+							return data.map((thread, i) => {
+								const user = users.find(user => user.uid === messages[i].author_id);
+								return this.getDialog(thread, messages[i], user);
+							});
+						}
+					);
 				});
 			}
 		);

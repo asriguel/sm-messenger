@@ -264,7 +264,7 @@ class VkService extends BaseService {
 		return this.callApiMethod("messages.send", { message, [ peerName ]: dialog[peerName] });
 	}
 	
-	getDialog(message, user) {
+	getDialog(message, user, peerData) {
 		const dialog = {
 			service: "vk",
 			text: message.body,
@@ -277,6 +277,11 @@ class VkService extends BaseService {
 			chat_title: message.chat_id ? message.title : undefined,
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50,
+			my: message.from_id == this.$rootScope.vk.id,
+			peer: {
+				full_name: peerData.isChat ? message.title : peerData.full_name,
+				photo: peerData.isChat ? message.photo_50 : peerData.photo_50
+			},
 			getMessages: () => this.getDialogMessages(dialog),
 			sendMessage: message => this.sendDialogMessage(dialog, message)
 		};
@@ -295,6 +300,7 @@ class VkService extends BaseService {
 					}
 				});
 				const userIds = items.map(({ message }) => message.from_id);
+				userIds.push(...items.filter(({ message }) => !message.chat_id).map(({ message }) => message.user_id));
 				if (userIds.length === 0) {
 					return [];
 				}
@@ -302,7 +308,13 @@ class VkService extends BaseService {
 					({ response: users }) => {
 						return items.map(({ message }) => {
 							const user = users.find(user => user.id == message.from_id);
-							return this.getDialog(message, user);
+							const peerData = { isChat: Boolean(message.chat_id) };
+							if (!peerData.isChat) {
+								const peer = users.find(user => user.id == message.user_id);
+								peerData.full_name = `${peer.first_name} ${peer.last_name}`;
+								peerData.photo_50 = peer.photo_50;
+							}
+							return this.getDialog(message, user, peerData);
 						});
 					}
 				);
