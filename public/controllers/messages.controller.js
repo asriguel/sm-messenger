@@ -2,13 +2,15 @@ app
     .controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, mailruService, toaster) {
     this.dialogs = [];
     this.messages = [];
+    this.services = [vkService, mailruService];
+
 
     // init vkService
     vkService.setClientId(6033392);
 	// init mailruService
     mailruService.setClientId(754302);
 
-    let services = [ vkService/*, mailruService*/ ];
+    let services = [ vkService, mailruService ];
 	
 	this.reloadCurrentDialog = () => {
 		if (!$rootScope.currentDialog) {
