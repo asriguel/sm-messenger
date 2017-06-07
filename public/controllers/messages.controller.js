@@ -4,7 +4,7 @@ app
     this.messages = [];
     this.services = [vkService, mailruService];
 
-
+		
     // init vkService
     vkService.setClientId(6033392);
 	// init mailruService
