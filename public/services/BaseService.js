@@ -18,4 +18,16 @@ class BaseService {
 		const requestString = this.buildRequestString(requestParams, { sort });
 		return `${baseURL}?${requestString}`;
 	}
+	
+	log(message) {
+		console.log(`${this.name}: ${message}`);
+	}
+	
+	warn(message) {
+		console.warn(`${this.name}: ${message}`);
+	}
+	
+	error(message) {
+		console.error(`${this.name}: ${message}`);
+	}
 }
