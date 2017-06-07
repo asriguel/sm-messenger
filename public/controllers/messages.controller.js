@@ -3,12 +3,7 @@ app
     this.dialogs = [];
     this.messages = [];
 
-    // init vkService
-    vkService.setClientId(6033392);
-	// init mailruService
-    mailruService.setClientId(754302);
-
-    let services = [ vkService/*, mailruService*/ ];
+    let services = [ vkService, mailruService ];
 	
 	this.reloadCurrentDialog = () => {
 		if (!$rootScope.currentDialog) {
