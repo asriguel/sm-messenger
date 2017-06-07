@@ -139,7 +139,7 @@ class VkService extends BaseService {
 	
 	processUpdate([ eventCode, ...data ]) {
 		if (eventCode == this.pollEventCodes.NEW_MESSAGE) {
-			console.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
+			super.log(`New message: ${JSON.stringify([ eventCode, ...data ])}`);
 			const [ messageId, flags, peerId, timestamp, text, extra ] = data;
 			const isChat = peerId > this.chatOffset;
 			const { currentDialog } = this.$rootScope;
@@ -172,7 +172,7 @@ class VkService extends BaseService {
 		if (updateDataArray.length === 0) {
 			return Promise.resolve();
 		}
-		console.log(`Updates: ${JSON.stringify(updateDataArray)}`);
+		super.log(`Updates: ${JSON.stringify(updateDataArray)}`);
 		const userIds = updateDataArray.filter(data => data.fromId).map(({ fromId }) => fromId);
 		return this.callApiMethod("users.get", { user_ids: userIds.join(",") }).then(
 			({ response: users }) => {
@@ -199,7 +199,7 @@ class VkService extends BaseService {
 			this.$rootScope.vk = {
 				id: user.id
 			};
-			console.log(`Connect successful: ${JSON.stringify(this.$rootScope.vk)}`);
+			super.log(`Connect successful: ${JSON.stringify(this.$rootScope.vk)}`);
 			this.$rootScope.$emit("reloadDialogList");
 			return this.initPoller();
 		}).catch(err => {
@@ -214,7 +214,7 @@ class VkService extends BaseService {
 			Object.assign({}, this.authConfig, { client_id: this.clientId })
 		);
         this.$window.open(requestURL, '_blank');
-        let authModal = this.$uibModal.open({
+        const authModal = this.$uibModal.open({
             templateUrl: 'assets/html/vkAuthModal.html',
             controller: function ($scope, $uibModalInstance) {
                 $scope.cancel = () => $uibModalInstance.close();
@@ -222,7 +222,7 @@ class VkService extends BaseService {
             }
         });
         return authModal.result.then(token => {
-			console.log(`Authorization VK successful: token=${token}`);
+			super.log(`Authorization successful: token=${token}`);
 			this.$cookies.put("vk_token", token);
 			return this.connect(token);
 		});
