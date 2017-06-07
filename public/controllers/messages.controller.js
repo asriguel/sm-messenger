@@ -4,12 +4,6 @@ app
     this.messages = [];
     this.services = [vkService, mailruService];
 
-		
-    // init vkService
-    vkService.setClientId(6033392);
-	// init mailruService
-    mailruService.setClientId(754302);
-
     let services = [ vkService, mailruService ];
 	
 	this.reloadCurrentDialog = () => {
