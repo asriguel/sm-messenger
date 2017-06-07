@@ -68,7 +68,7 @@
 </div>
 <div class="col-md-9 no-float" id="main">
     <ul class="chat">
-        <li ng-repeat="message in msgsCtrl.messages" class="left clearfix"><span class="chat-img pull-left">
+        <li ng-repeat="message in msgsCtrl.messages" ng-class="{ 'my-msg' : message.my }" class="left clearfix"><span class="chat-img pull-left">
                             <img ng-src="{{message.photo}}" alt="User Avatar" class="img-circle"/>
                         </span>
             <div class="chat-body clearfix">
