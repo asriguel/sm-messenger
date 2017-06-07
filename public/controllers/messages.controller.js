@@ -2,6 +2,7 @@ app
     .controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, mailruService, toaster) {
     this.dialogs = [];
     this.messages = [];
+    this.services = [vkService, mailruService];
 
     let services = [ vkService, mailruService ];
 	
