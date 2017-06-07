@@ -142,11 +142,12 @@ class MailruService extends BaseService {
 	getMessage({ message, time, type }, { full_name, photo }) {
 		const isMy = type == 0;
 		return {
-			text: message.map(({ content }) => content).join(""),
+			text: message.filter(({ object }) => object === "text" || object === "smile").map(({ content }) => content).join(""),
 			date: new Date(time * 1000),
 			full_name: isMy ? this.$rootScope.mailru.full_name : full_name,
 			photo: isMy ? this.$rootScope.mailru.photo : photo,
-			my: isMy
+			my: isMy,
+			images: message.filter(({ object }) => object === "photo").map(({ content: { src } }) => src)
 		};
 	}
 	
@@ -163,7 +164,7 @@ class MailruService extends BaseService {
 	getDialog(thread, lastMessage, lastUser) {
 		const dialog = {
 			service: "mailru",
-			text: lastMessage.message.map(part => String(part.content)).join(""),
+			text: lastMessage.message.filter(({ object }) => object === "text" || object === "smile").map(part => String(part.content)).join(""),
 			unread: Boolean(thread.unread),
 			date: new Date(thread.time * 1000),
 			user_id: thread.user.uid,

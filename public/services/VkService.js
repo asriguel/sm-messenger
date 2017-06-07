@@ -233,7 +233,8 @@ class VkService extends BaseService {
 			from_id: message.from_id,
 			full_name: `${user.first_name} ${user.last_name}`,
 			photo: user.photo_50,
-			my: message.from_id == this.$rootScope.vk.id
+			my: message.from_id == this.$rootScope.vk.id,
+			images: (message.attachments || []).filter(({ type }) => type === "photo").map(({ photo: { photo_604 } }) => photo_604)
 		};
 		return msg;
 	}
