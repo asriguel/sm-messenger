@@ -8,8 +8,9 @@ class MailruService extends BaseService {
         this.$cookies = $cookies;
         this.toaster = toaster;
         this.$timeout = $timeout;
-		
+
 		this.clientId = 754302;
+		this.icon = 'http://www.iconninja.com/files/267/622/541/email-mail-ru-square-contacts-contact-address-book-mailru-icon.svg';
 		
 		this.apiURL = "http://appsmail.ru/platform/api";
 		this.privateKey = "7c97f09acae3d5dede5542ffecec1f77";
