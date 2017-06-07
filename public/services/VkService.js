@@ -9,6 +9,8 @@ class VkService extends BaseService {
         this.toaster = toaster;
         this.$timeout = $timeout;
 		
+		this.clientId = 6033392;
+		
 		this.apiURL = "https://api.vk.com/method";
 		this.apiVersion = "5.65";
 		this.apiErrorCodes = {
@@ -83,10 +85,6 @@ class VkService extends BaseService {
 			}, scheduledRequestTimestamp - ts);
 		});
 	}
-
-    setClientId(clientId) {
-        this.clientId = clientId;
-    }
 	
 	callApiMethod(methodName, params) {
 		const url = super.buildRequestURL(

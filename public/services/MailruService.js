@@ -9,6 +9,8 @@ class MailruService extends BaseService {
         this.toaster = toaster;
         this.$timeout = $timeout;
 		
+		this.clientId = 754302;
+		
 		this.apiURL = "http://appsmail.ru/platform/api";
 		this.privateKey = "7c97f09acae3d5dede5542ffecec1f77";
 		
@@ -35,10 +37,6 @@ class MailruService extends BaseService {
 		else {
 			super.log(`No previous session restored`);
 		}
-	}
-	
-	setClientId(clientId) {
-		this.clientId = clientId;
 	}
 	
 	makeSig(params) {
