@@ -3,9 +3,7 @@ app
     this.dialogs = [];
     this.messages = [];
     this.services = [vkService, mailruService];
-
-    let services = [ vkService, mailruService ];
-	
+		
 	this.reloadCurrentDialog = () => {
 		if (!$rootScope.currentDialog) {
 			console.warn(`Cannot reload current dialog: no current dialog`);
@@ -50,7 +48,7 @@ app
 	};
 	
 	this.reloadDialogList = () => {
-		return Promise.all(services.map(service => reloadServiceDialogs(service))).then(dialogLists => {
+		return Promise.all(this.services.map(service => reloadServiceDialogs(service))).then(dialogLists => {
 			this.dialogs = dialogLists.reduce((dialogs, list) => {
 				dialogs.push(...list);
 				return dialogs;
@@ -99,7 +97,7 @@ app
                 };
             },
             resolve: {
-                services: () => services
+                services: () => this.services
             }
         });
     };
