@@ -145,7 +145,8 @@ class MailruService extends BaseService {
 			text: message.map(({ content }) => content).join(""),
 			date: new Date(time * 1000),
 			full_name: isMy ? this.$rootScope.mailru.full_name : full_name,
-			photo: isMy ? this.$rootScope.mailru.photo : photo
+			photo: isMy ? this.$rootScope.mailru.photo : photo,
+			my: isMy
 		};
 	}
 	

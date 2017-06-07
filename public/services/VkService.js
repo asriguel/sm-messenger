@@ -232,7 +232,8 @@ class VkService extends BaseService {
 			date: new Date(message.date * 1000),
 			from_id: message.from_id,
 			full_name: `${user.first_name} ${user.last_name}`,
-			photo: user.photo_50
+			photo: user.photo_50,
+			my: message.from_id == this.$rootScope.vk.id
 		};
 		return msg;
 	}
