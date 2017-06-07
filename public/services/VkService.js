@@ -10,6 +10,7 @@ class VkService extends BaseService {
         this.$timeout = $timeout;
 		
 		this.clientId = 6033392;
+		this.icon = 'https://cdn.iconscout.com/public/images/icon/free/png-256/vk-social-media-30e7c557bc2ab7f2-256x256.png';
 		
 		this.apiURL = "https://api.vk.com/method";
 		this.apiVersion = "5.65";

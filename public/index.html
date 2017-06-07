@@ -3,13 +3,24 @@
 <head>
     <title>Messenger</title>
 
-    <!-- Angular -->
-    <script src="bower_components/angular/angular.min.js"></script>
+
     <!-- jQuery -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+    <!--font-awesome-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--scrollbars-->
+    <link rel="stylesheet" href="/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" type="text/css"/>
+    <script src="/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+
+
+
+    <!-- Angular -->
+    <script src="bower_components/angular/angular.min.js"></script>
     <!-- Angular-bootstrap -->
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <!-- angular-cookies -->
@@ -25,11 +36,12 @@
     <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/moment/locale/ru.js"></script>
     <script src="bower_components/angular-moment/angular-moment.min.js"></script>
-	<!-- blueimp-md5 -->
-	<script src="bower_components/blueimp-md5/js/md5.min.js"></script>
+    <!-- blueimp-md5 -->
+    <script src="bower_components/blueimp-md5/js/md5.min.js"></script>
 
-    <!--font-awesome-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--scrollbars-->
+    <script src="/bower_components/ng-scrollbars/dist/scrollbars.js"></script>
+
     <!-- app -->
     <script src="app.js"></script>
 
@@ -40,6 +52,9 @@
 
     <!-- Controllers -->
     <script src="controllers/messages.controller.js"></script>
+
+
+
 
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/common.css">
@@ -52,29 +67,35 @@
 <aside class="services">
     <ul class="services__list">
         <li ng-repeat="service in msgsCtrl.services" ng-if="service.connected">
-            <span ng-bind-html="service.name" ></span>
+            <!--<span ng-bind-html="service.name" ></span>-->
+            <img ng-src="{{service.icon}}" alt="" width="35" height="35">
         </li>
         <li>
-            <button class="btn btn-success" ng-if="true" ng-click="msgsCtrl.addService()"><i class="fa fa-plus"></i></button>
+            <button class="btn btn-success btn-circle" ng-if="true" ng-click="msgsCtrl.addService()"><i class="fa fa-plus"></i></button>
         </li>
     </ul>
 
 
 </aside>
 <div class="wrapper">
-    <div class="col-md-4 no-float dialogs-column" id="nav" ng-class="{'centered': !msgsCtrl.dialogs.length}">
+    <div ng-scrollbars  ng-scrollbars-config="config" class="col-md-4 no-float dialogs-column"  id="nav" ng-class="{'centered': !msgsCtrl.dialogs.length}">
             <span ng-if="!msgsCtrl.dialogs.length">
                 No dialogs
             </span>
     <ul class="friend-list">
-        <li class="bounceInDown" ng-repeat="dialog in msgsCtrl.dialogs | orderBy: '-date'" ng-class="{'active': dialog.unread}">
+        <li class="bounceInDown" ng-repeat="dialog in msgsCtrl.dialogs | orderBy: '-date'" ng-class="{'active': dialog.unread}" >
             <a href="#" class="clearfix" ng-click="msgsCtrl.setCurrentDialog(dialog)">
-                <img ng-src="{{dialog.photo}}" alt="" class="img-circle">
+
+                <img  ng-src="{{dialog.peer.photo}}" alt="" class="img-circle">
+                <span class="service-icon">
+                    <!--<img ng-src="{{dialog.}}" alt="">-->
+                    <span class="service-id" ng-class="dialog.service" ng-bind-html="dialog.service"></span>
+                </span>
                 <div class="friend-name" ng-switch="dialog.type">
-                    <strong ng-bind="dialog.full_name" ng-switch-when="1"></strong>
-                    <strong ng-bind="dialog.chat_title" ng-switch-when="2"></strong>
+                    <strong ng-bind="dialog.peer.full_name" ng-switch-when="1"></strong>
+                    <strong ng-bind="dialog.peer.chat_title" ng-switch-when="2"></strong>
                 </div>
-                <div class="last-message text-muted" ng-bind-html="dialog.text"></div>
+                <img class="tiny-photo img-circle" ng-show="dialog.my" src="{{dialog.photo}}" alt=""><div class="last-message text-muted" ng-bind-html="dialog.text"></div>
                 <small class="time text-muted" am-time-ago="dialog.date"></small>
                 <small class="chat-alert label label-info"> </small>
             </a>
@@ -83,16 +104,16 @@
 
 
     </div>
-    <div class="col-md-8 no-float" id="main">
+    <div class="col-md-8 no-float chat-column" ng-scrollbars ng-scrollbars="config" id="main">
         <ul class="chat">
-            <li ng-repeat="message in msgsCtrl.messages" class="left clearfix" ><span class="chat-img pull-left">
+            <li ng-repeat="message in msgsCtrl.messages" class="left clearfix" ng-class="message.my ? 'my' : ''"><span class="chat-img pull-left">
                             <img ng-src="{{message.photo}}" alt="User Avatar" class="img-circle"/>
                         </span>
                 <div class="chat-body clearfix">
                     <div class="header">
                         <strong class="primary-font" ng-bind="message.full_name"></strong>
                         <small class="pull-right text-muted">
-                            <span class="glyphicon glyphicon-time"></span> <span am-time-ago="message.date"></span>
+                             <span class="msg-time" am-time-ago="message.date"></span>
                         </small>
                     </div>
                     <p ng-bind-html="message.text">
@@ -105,14 +126,20 @@
 	                </ul>
                 </div>
             </li>
-            <li>
-                <textarea id="msgbox" class="col-md-12" ng-model="message" ng-textarea-enter="msgsCtrl.sendMessage()" placeholder="Type message"></textarea>
-            </li>
+
         </ul>
 
 
     </div>
+<div class="col-md-8 msgbox-wrapper">
+    <textarea id="msgbox" class="col-md-8" ng-model="message" ng-textarea-enter="msgsCtrl.sendMessage()" placeholder="Type message"></textarea>
+    <button class="send-message-btn"><img src="img/send-msg-icon.png" alt=""></button>
 </div>
+
+
+</div>
+
+<!--scrollbars-->
 
 </body>
 </html>
