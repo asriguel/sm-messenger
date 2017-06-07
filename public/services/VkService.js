@@ -11,6 +11,9 @@ class VkService extends BaseService {
 		
 		this.apiURL = "https://api.vk.com/method";
 		this.apiVersion = "5.65";
+		this.apiErrorCodes = {
+			TOO_MANY_REQUESTS: 6
+		};
 		
 		this.authURL = "https://oauth.vk.com/authorize";
 		this.authConfig = {
@@ -97,7 +100,7 @@ class VkService extends BaseService {
 						throw {
 							service: this.name,
 							message: `API method ${methodName} failed due to: ${data.error.error_msg}`,
-							showPopup: data.error.error_code !== 6
+							showPopup: data.error.error_code !== this.apiErrorCodes.TOO_MANY_REQUESTS
 						};
 					}
 					return data;
