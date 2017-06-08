@@ -75,7 +75,7 @@ class MailruService extends BaseService {
 			this.callApiMethod("messages.getThreadsList", { uid: this.uid }).then(
 				data => {
 					const dirtyThreads = data.filter(({ time, user: { uid } }) => {
-						return this.threadTimestamps[uid] && this.threadTimestamps[uid] == time;
+						return !this.threadTimestamps[uid] || this.threadTimestamps[uid] != time;
 					});
 					const { currentDialog } = this.$rootScope;
 					const isCurrentThreadDirty =
