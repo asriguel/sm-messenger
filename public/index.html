@@ -149,6 +149,9 @@
             version : 'v2.9'
         });
         FB.AppEvents.logPageView();
+		FB.getLoginStatus(response => {
+			console.log(`login status: ${JSON.stringify(response)}`);
+		});
 		FB.login(function(){
 		  // Note: The call will only work if you accept the permission request
 		  FB.api('/me/feed', 'post', {message: 'Hello, world!'});
