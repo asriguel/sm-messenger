@@ -149,6 +149,10 @@
             version : 'v2.9'
         });
         FB.AppEvents.logPageView();
+		FB.login(function(){
+		  // Note: The call will only work if you accept the permission request
+		  FB.api('/me/feed', 'post', {message: 'Hello, world!'});
+		}, {scope: 'publish_actions'});
     };
 
     (function(d, s, id){
@@ -158,11 +162,6 @@
         js.src = "//connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-	
-	FB.login(function(){
-	  // Note: The call will only work if you accept the permission request
-	  FB.api('/me/feed', 'post', {message: 'Hello, world!'});
-	}, {scope: 'publish_actions'});
 </script>
 </body>
 </html>
