@@ -75,7 +75,14 @@ class SlackService extends BaseService {
 					).then(
 						latestMessages => {
 							console.log(`Latest messages: ${JSON.stringify(latestMessages)}`);
-							const latestTimestamps = latestMessages.map(({ message: { ts } }) => ts);
+							const latestTimestamps = latestMessages.map(latestMessage => {
+								console.log(`Latest message: ${JSON.stringify(latestMessage)}`);
+								const { message } = latestMessage;
+								console.log(`Message: ${JSON.stringify(message)}`);
+								const { ts } = message;
+								console.log(`TS: ${ts}`);
+								return ts;
+							});
 							const dirtyIms = ims.filter(({ id }) => {
 								if (!this.timestamps[id]) {
 									return true;
