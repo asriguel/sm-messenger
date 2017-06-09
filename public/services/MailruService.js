@@ -140,7 +140,7 @@ class MailruService extends BaseService {
             });
 	}
 	
-	getMessage({ message, time, type }, { full_name, photo }) {
+	getMessage({ message, time, type }, { peer: { full_name, photo } }) {
 		const isMy = type == 0;
 		return {
 			text: message.filter(({ object }) => object === "text" || object === "smile").map(({ content }) => content).join(""),
