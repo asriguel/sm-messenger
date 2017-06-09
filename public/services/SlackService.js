@@ -68,7 +68,9 @@ class SlackService extends BaseService {
 					return Promise.all(
 						channelIds.map(id => {
 							return this.callApiMethod("im.history", { channel: id, count: 1 }).then(
-								({ messages: [ message ] }) => ({ id, message })
+								({ messages: [ message ] }) => {
+									return message ? { id, message } : {};
+								}
 							);
 						}).filter(({ message }) => message)
 					).then(
@@ -182,7 +184,11 @@ class SlackService extends BaseService {
 			({ ims }) => {
 				return Promise.all(ims.map(({ id, user }) => {
 					return this.callApiMethod("im.history", { channel: id, count: 1 }).then(
-						({ messages: [ { user: userId, text, ts } ] }) => {
+						({ messages: [ message ] }) => {
+							if (!message) {
+								return Promise.resolve(null);
+							}
+							const { user: userId, text, ts } = message;
 							return this.callApiMethod("users.info", { user: userId }).then(
 								({ user: { profile: { real_name, image_48 } } }) => {
 									return this.callApiMethod("users.info", { user }).then(
@@ -213,7 +219,7 @@ class SlackService extends BaseService {
 							);
 						}
 					);
-				}));
+				})).then(dialogs => dialogs.filter(dialog => dialog != null));
 			}
 		);
 	}
