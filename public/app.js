@@ -7,7 +7,8 @@ app.config(function ($sceDelegateProvider) {
         'https://**.vk.com/**',
 		'http://appsmail.ru/**',
 		'https://**.mail.ru/**',
-		'http://**.mail.ru/**']);
+		'http://**.mail.ru/**',
+		'https://slack.com/**']);
 
 
 });
