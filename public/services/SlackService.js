@@ -107,7 +107,7 @@ class SlackService extends BaseService {
 		this.token = token;
 		this.connected = true;
 		return this.callApiMethod("users.info", { user: uid }).then(
-			({ profile: { real_name, image_48 } }) => {
+			({ user: { profile: { real_name, image_48 } } }) => {
 				this.$rootScope.slack = { uid, tid, full_name: real_name, photo: image_48 };
 				super.log(`Connect successful: ${JSON.stringify(this.$rootScope.slack)}`);
 				this.$rootScope.$emit("reloadDialogList");
@@ -179,9 +179,9 @@ class SlackService extends BaseService {
 					return this.callApiMethod("im.history", { channel: id, count: 1 }).then(
 						({ messages: [ { user: userId, text, ts } ] }) => {
 							return this.callApiMethod("users.info", { user: userId }).then(
-								({ profile: { real_name, image_48 } }) => {
+								({ user: { profile: { real_name, image_48 } } }) => {
 									return this.callApiMethod("users.info", { user }).then(
-										({ profile: { real_name: peerName, image_48: peerPhoto } }) => {
+										({ user: { profile: { real_name: peerName, image_48: peerPhoto } } }) => {
 											const dialog = {
 												service: "slack",
 												id,
