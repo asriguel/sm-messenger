@@ -158,7 +158,7 @@ class SlackService extends BaseService {
 		return this.callApiMethod("im.history", { channel: dialog.id }).then(
 			({ messages }) => {
 				return messages.map(({ user, text, ts }) => {
-					return {
+					const msg = {
 						text,
 						date: new Date(Number(ts.substring(0, ts.indexOf("."))) * 1000),
 						full_name: user == this.$rootScope.slack.uid ? this.$rootScope.slack.full_name : dialog.peer.full_name,
@@ -166,6 +166,8 @@ class SlackService extends BaseService {
 						my: user == this.$rootScope.slack.uid,
 						images: []
 					};
+					console.log(`Message: ${JSON.stringify(msg)}`);
+					return msg;
 				});
 			}
 		);
@@ -203,6 +205,7 @@ class SlackService extends BaseService {
 												getMessages: () => this.getDialogMessages(dialog),
 												sendMessage: message => this.sendDialogMessage(dialog, message)
 											};
+											console.log(`Dialog: ${JSON.stringify(dialog)}`);
 											return dialog;
 										}
 									);
