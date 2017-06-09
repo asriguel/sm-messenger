@@ -71,7 +71,7 @@ class SlackService extends BaseService {
 							return this.callApiMethod("im.history", { channel: id, count: 1 }).then(
 								({ messages: [ message ] }) => ({ id, message })
 							);
-						})
+						}).filter(({ message }) => message)
 					).then(
 						latestMessages => {
 							console.log(`Latest messages: ${JSON.stringify(latestMessages)}`);
