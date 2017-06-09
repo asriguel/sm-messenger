@@ -111,7 +111,12 @@ class SlackService extends BaseService {
 				this.$rootScope.$emit("reloadDialogList");
 				this.initPoller();
 			}
-		);
+		).catch(err => {
+			this.$cookies.remove("slack_token");
+			this.$cookies.remove("slack_uid");
+			this.$cookies.remove("slack_tid");
+			throw err;
+		});
 	}
 	
 	auth() {
@@ -140,11 +145,6 @@ class SlackService extends BaseService {
 				this.$cookies.put("slack_tid", team_id);
 				super.log(`Authorization successful: token=${access_token}, user_id=${user_id}, team_id=${team_id}`);
 				return this.connect(access_token, user_id, team_id);
-			}).catch(err => {
-				this.$cookies.remove("slack_token");
-				this.$cookies.remove("slack_uid");
-				this.$cookies.remove("slack_tid");
-				throw err;
 			});
 		});
     }
