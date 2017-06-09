@@ -49,6 +49,7 @@ app
 	
 	this.reloadDialogList = () => {
 		return Promise.all(this.services.map(service => reloadServiceDialogs(service))).then(dialogLists => {
+			console.log(`Dialogs lists: ${JSON.stringify(dialogLists)}`);
 			this.dialogs = dialogLists.reduce((dialogs, list) => {
 				dialogs.push(...list);
 				return dialogs;
