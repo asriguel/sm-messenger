@@ -161,14 +161,15 @@ class SlackService extends BaseService {
 	getDialogMessages(dialog) {
 		return this.callApiMethod("im.history", { channel: dialog.id }).then(
 			({ messages }) => {
-				return messages.map(({ user, text, ts }) => {
+				return messages.map(({ user, text, ts, subtype, file }) => {
 					const msg = {
 						text,
 						date: new Date(Number(ts.substring(0, ts.indexOf("."))) * 1000),
 						full_name: user == this.$rootScope.slack.uid ? this.$rootScope.slack.full_name : dialog.peer.full_name,
 						photo: user == this.$rootScope.slack.uid ? this.$rootScope.slack.photo : dialog.peer.photo,
 						my: user == this.$rootScope.slack.uid,
-						images: []
+						images: subtype === "file_share" && file && file.mimetype && file.mimetype.startsWith("image")
+						? [ file.url_private ] : []
 					};
 					console.log(`Message: ${JSON.stringify(msg)}`);
 					return msg;
