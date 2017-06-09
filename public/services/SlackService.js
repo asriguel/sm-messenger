@@ -215,7 +215,7 @@ class SlackService extends BaseService {
 					);
 				}));
 			}
-		);
+		).then(data => { console.log(`getDialogs() after data: ${JSON.stringify(data)}`); return data; });
 	}
 }
 
