@@ -168,7 +168,7 @@ class SlackService extends BaseService {
 					};
 					console.log(`Message: ${JSON.stringify(msg)}`);
 					return msg;
-				});
+				}).reverse();
 			}
 		);
 	}
