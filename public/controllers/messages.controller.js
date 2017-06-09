@@ -1,8 +1,8 @@
 app
-    .controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, mailruService, toaster) {
+    .controller('messagesController', function ($scope, $rootScope, $uibModal, $window, $http, vkService, mailruService, slackService, toaster) {
     this.dialogs = [];
     this.messages = [];
-    this.services = [vkService, mailruService];
+    this.services = [ vkService, mailruService, slackService ];
 		
 	this.reloadCurrentDialog = () => {
 		if (!$rootScope.currentDialog) {
