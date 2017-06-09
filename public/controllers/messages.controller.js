@@ -62,6 +62,7 @@ app
 				return Promise.resolve();
 			}
 		}).catch(err => {
+			console.error(err);
 			if (err.showPopup) {
 				toaster.pop("error", err.service, err.message);
 			}
