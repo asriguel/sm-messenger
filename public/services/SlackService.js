@@ -9,6 +9,8 @@ class SlackService extends BaseService {
         this.toaster = toaster;
         this.$timeout = $timeout;
 		
+		this.icon = "https://s-media-cache-ak0.pinimg.com/originals/94/2a/74/942a74f009074802986cc1ed0feca078.jpg";
+		
 		this.clientId = "194468629137.194967149827";
 		this.secret = "ef0e3e2d4e4aa99f11b1e489f0961e90";
 		
