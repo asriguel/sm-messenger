@@ -47,7 +47,6 @@ class SlackService extends BaseService {
 			`${this.apiURL}/${methodName}`,
 			Object.assign({}, params, init ? {} : { token: this.token })
 		);
-		console.log(`Calling API method at URL: ${url}`);
 		return this.$http.get(url).then(({ data }) => {
 			if (!data.ok) {
 				throw {
@@ -74,13 +73,9 @@ class SlackService extends BaseService {
 						}).filter(({ message }) => message)
 					).then(
 						latestMessages => {
-							console.log(`Latest messages: ${JSON.stringify(latestMessages)}`);
 							const latestTimestamps = latestMessages.map(latestMessage => {
-								console.log(`Latest message: ${JSON.stringify(latestMessage)}`);
 								const { message } = latestMessage;
-								console.log(`Message: ${JSON.stringify(message)}`);
 								const { ts } = message;
-								console.log(`TS: ${ts}`);
 								return ts;
 							});
 							const dirtyIms = ims.filter(({ id }) => {
