@@ -47,6 +47,7 @@ class SlackService extends BaseService {
 			`${this.apiURL}/${methodName}`,
 			Object.assign({}, params, init ? {} : { token: this.token })
 		);
+		console.log(`Calling API method at URL: ${url}`);
 		return this.$http.get(url).then(({ data }) => {
 			if (!data.ok) {
 				throw {
@@ -55,6 +56,7 @@ class SlackService extends BaseService {
 					showPopup: true
 				};
 			}
+			console.log(`Received data: ${JSON.stringify(data)}`);
 			return data;
 		});
 	}
