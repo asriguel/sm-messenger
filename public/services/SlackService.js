@@ -116,7 +116,7 @@ class SlackService extends BaseService {
 				this.$rootScope.slack = { uid, tid, full_name: real_name, photo: image_48 };
 				super.log(`Connect successful: ${JSON.stringify(this.$rootScope.slack)}`);
 				this.$rootScope.$emit("reloadDialogList");
-				//this.initPoller();
+				this.initPoller();
 			}
 		).catch(err => {
 			this.$cookies.remove("slack_token");
