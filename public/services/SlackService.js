@@ -175,7 +175,7 @@ class SlackService extends BaseService {
 		);
 	}
 	
-	sendDialogMessage(message, dialog) {
+	sendDialogMessage(dialog, message) {
 		return this.callApiMethod("chat.postMessage", { channel: dialog.id, text: message, as_user: true }).then(
 			data => {
 				console.log(`Message sent: ${JSON.stringify(data)}`);
