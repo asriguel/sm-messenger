@@ -210,3 +210,5 @@ class SlackService extends BaseService {
 		);
 	}
 }
+
+app.service('slackService', SlackService);
